@@ -12,7 +12,7 @@ const SUGGESTIONS = {
   [CATEGORIES.FOOD]: [
     "Swap one meat-based meal for a plant-based alternative each week.",
     "Buy local and seasonal produce to reduce transportation emissions.",
-    "Plan meals carefully to minimize food waste.",
+    "Plan meals carefully to minimise food waste.",
   ],
   [CATEGORIES.ENERGY]: [
     "Switch to LED bulbs and turn off lights when leaving a room.",
@@ -33,51 +33,73 @@ const ICONS = {
   [CATEGORIES.SHOPPING]: ShoppingBag,
 };
 
+const CATEGORY_COLORS = {
+  [CATEGORIES.TRANSPORT]: '#00D4FF',
+  [CATEGORIES.FOOD]:      '#FFB547',
+  [CATEGORIES.ENERGY]:    '#00FF87',
+  [CATEGORIES.SHOPPING]:  '#FF4D6D',
+};
+
 const ActionSuggestions = ({ highestImpactCategory }) => {
   if (!highestImpactCategory) {
     return (
-      <div className="glass p-6 md:p-8 rounded-3xl border-cyan/20" role="region" aria-label="Protocol Recommendations">
-        <div className="flex items-center gap-3 text-cyan mb-3">
-          <Lightbulb size={24} aria-hidden="true" className="drop-shadow-[0_0_8px_rgba(0,212,255,0.8)]" />
-          <h2 className="text-xl font-bold font-orbitron">Protocol Recommendations</h2>
+      <div className="glass rounded-3xl p-6 md:p-8" role="region" aria-label="Protocol Recommendations">
+        <div className="flex items-center gap-3 mb-4">
+          <Lightbulb size={20} aria-hidden="true" style={{ color: '#00D4FF', filter: 'drop-shadow(0 0 6px #00D4FF)' }} />
+          <h2 className="font-orbitron font-black text-base tracking-wider" style={{ color: '#e5e7eb' }}>
+            PROTOCOL RECOMMENDATIONS
+          </h2>
         </div>
-        <p className="text-gray-400 leading-relaxed font-inter">
-          Awaiting input data. Log activities to receive personalized efficiency protocols.
+        <p className="font-mono text-sm" style={{ color: 'rgba(255,255,255,0.4)', lineHeight: 1.7 }}>
+          ▸ AWAITING FIELD DATA INPUT<br />
+          ▸ LOG ACTIVITIES TO RECEIVE PERSONALIZED EFFICIENCY PROTOCOLS
         </p>
       </div>
     );
   }
 
-  const tips = SUGGESTIONS[highestImpactCategory] || [];
-  const Icon = ICONS[highestImpactCategory] || Lightbulb;
+  const tips  = SUGGESTIONS[highestImpactCategory] || [];
+  const Icon  = ICONS[highestImpactCategory] || Lightbulb;
+  const color = CATEGORY_COLORS[highestImpactCategory] || '#00D4FF';
 
   return (
-    <div className="glass p-6 md:p-8 rounded-3xl text-gray-200" role="region" aria-label={`Action plan for ${highestImpactCategory}`}>
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-2.5 bg-electric/10 rounded-xl border border-electric/30 shadow-[0_0_10px_rgba(0,255,135,0.2)]" aria-hidden="true">
-          <Icon size={24} className="text-electric drop-shadow-[0_0_8px_rgba(0,255,135,0.8)]" aria-hidden="true" />
+    <div className="glass rounded-3xl p-6 md:p-8"
+      style={{ borderColor: `${color}44` }}
+      role="region" aria-label={`Action plan for ${highestImpactCategory}`}>
+
+      <div className="flex items-center gap-3 mb-5">
+        <div className="p-2.5 rounded-xl shrink-0"
+          style={{ background: `${color}14`, border: `1px solid ${color}44` }}>
+          <Icon size={22} aria-hidden="true" style={{ color, filter: `drop-shadow(0 0 6px ${color})` }} />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-white font-orbitron tracking-wide">Action Plan</h2>
-          <p className="text-cyan text-sm font-semibold uppercase tracking-widest mt-1">
-            Target: <span aria-label={`Highest impact category: ${highestImpactCategory}`}>{highestImpactCategory}</span>
+          <h2 className="font-orbitron font-black text-sm tracking-widest" style={{ color: '#e5e7eb' }}>
+            ACTION PLAN
+          </h2>
+          <p className="font-mono text-xs mt-0.5 tracking-widest" style={{ color }}>
+            ▸ TARGET: {highestImpactCategory.toUpperCase()}
           </p>
         </div>
       </div>
 
-      <ul className="flex flex-col gap-4" aria-label={`Recommendations for ${highestImpactCategory}`}>
-        {tips.map((tip, index) => (
-          <li
-            key={index}
-            className="flex items-start gap-3 bg-space/50 p-4 rounded-xl border border-cardBorder hover:border-cyan hover:shadow-[0_0_10px_rgba(0,212,255,0.2)] hover:-translate-y-1 transition-all duration-300"
-          >
-            <span
-              className="flex items-center justify-center w-6 h-6 rounded-full bg-cyan/20 text-cyan text-sm font-bold shrink-0 mt-0.5 border border-cyan/30"
-              aria-hidden="true"
-            >
-              {index + 1}
-            </span>
-            <span className="text-gray-300 leading-relaxed text-sm md:text-base font-inter">{tip}</span>
+      <ul className="flex flex-col gap-3" aria-label={`Recommendations for ${highestImpactCategory}`}>
+        {tips.map((tip, i) => (
+          <li key={i} className="flex items-start gap-3 rounded-xl p-3.5 border transition-all duration-300 group cursor-default"
+            style={{ background: 'rgba(2,9,23,0.7)', borderColor: '#1A3A5C' }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = color;
+              e.currentTarget.style.boxShadow = `0 0 12px ${color}33`;
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = '#1A3A5C';
+              e.currentTarget.style.boxShadow = 'none';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}>
+            <span className="w-5 h-5 rounded flex items-center justify-center text-xs font-orbitron font-black shrink-0 mt-0.5"
+              style={{ background: `${color}22`, color, border: `1px solid ${color}44` }}
+              aria-hidden="true">{i + 1}</span>
+            <span className="font-inter text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)' }}>{tip}</span>
           </li>
         ))}
       </ul>
@@ -88,9 +110,5 @@ const ActionSuggestions = ({ highestImpactCategory }) => {
 ActionSuggestions.propTypes = {
   highestImpactCategory: PropTypes.oneOf([...Object.values(CATEGORIES), null]),
 };
-
-ActionSuggestions.defaultProps = {
-  highestImpactCategory: null,
-};
-
+ActionSuggestions.defaultProps = { highestImpactCategory: null };
 export default memo(ActionSuggestions);

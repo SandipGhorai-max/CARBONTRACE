@@ -4,46 +4,18 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!-- Primary Meta -->
-    <title>CarbonTrace - Personal Carbon Footprint Tracker</title>
-    <meta name="description" content="Track your daily carbon footprint, visualise your impact, and take actionable steps to meet Paris Agreement targets. Free, private, and offline-capable." />
-    <meta name="theme-color" content="#080B14" />
+    <title>CarbonTrace — AI Climate Command Center</title>
+    <meta name="description" content="AI-powered personal carbon footprint command center. Track, analyze, and reduce your climate impact in real time." />
+    <meta name="theme-color" content="#020917" />
     <meta name="referrer" content="no-referrer-when-downgrade" />
-
-    <!-- Content Security Policy
-         - default-src 'self'           : Only load resources from same origin
-         - script-src 'self' 'unsafe-inline' https://*.googleapis.com https://*.gstatic.com https://*.firebaseapp.com https://*.firebase.com : Firebase SDK requires inline scripts
-         - style-src 'self' 'unsafe-inline' https://fonts.googleapis.com : Google Fonts + Tailwind inline styles
-         - font-src 'self' https://fonts.gstatic.com : Google Fonts file delivery
-         - img-src 'self' data: blob:   : Allow SVG data URIs and blob URLs
-         - connect-src 'self' https://*.googleapis.com https://*.firebase.com https://*.firebaseio.com wss://*.firebaseio.com : Firebase RTDB WebSocket + REST
-    -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="
-        default-src 'self';
-        script-src 'self' 'unsafe-inline' https://*.googleapis.com https://*.gstatic.com https://*.firebaseapp.com https://*.firebase.com;
-        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-        font-src 'self' https://fonts.gstatic.com;
-        img-src 'self' data: blob:;
-        connect-src 'self' https://*.googleapis.com https://*.firebase.com https://*.firebaseio.com wss://*.firebaseio.com;
-        object-src 'none';
-        base-uri 'self';
-        form-action 'self';
-      "
-    />
-
-    <!-- Open Graph / Social Sharing -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googleapis.com https://*.gstatic.com https://*.firebaseapp.com https://*.firebase.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.googleapis.com https://*.firebase.com https://*.firebaseio.com wss://*.firebaseio.com; object-src 'none'; base-uri 'self'; form-action 'self';" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="CarbonTrace - Personal Carbon Footprint Tracker" />
-    <meta property="og:description" content="Track your daily carbon footprint and take action to meet the Paris Agreement targets." />
-    <meta property="og:locale" content="en_US" />
-
-    <!-- Google Fonts -->
+    <meta property="og:title" content="CarbonTrace — AI Climate Command Center" />
+    <meta property="og:description" content="Track your carbon footprint with an AI climate command center interface." />
+    <!-- Google Fonts: Orbitron + JetBrains Mono + Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div id="root"></div>

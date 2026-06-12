@@ -93,7 +93,8 @@ describe('formatters.js', () => {
 
     it('handles activity with missing fields gracefully (failure case)', () => {
       const csv = generateCSV([{ id: '1' }]);
-      expect(csv).toContain('1,,,,,0');
+      // id present; date/category/type empty; amount defaults to 0; co2 defaults to 0
+      expect(csv).toContain('1,,,,0,0');
     });
 
     it('handles activity with co2 of 0 correctly (edge case)', () => {

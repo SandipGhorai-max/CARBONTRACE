@@ -1,77 +1,123 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Flame, TrendingDown, TrendingUp } from 'lucide-react';
 import { GLOBAL_AVERAGE_TONS } from '../constants/carbonFactors';
 import { formatNumber } from '../utils/formatters';
 
+/* Animated count-up number */
+const CountUp = ({ target, duration = 1200 }) => {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!ref.current) return;
+    const start = performance.now();
+    const tick = (now) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      if (ref.current) ref.current.textContent = Math.round(target * ease);
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [target, duration]);
+  return <span ref={ref}>0</span>;
+};
+
 const WeeklyProgress = ({ streak, projectedTons }) => {
-  // Guard against NaN/undefined projectedTons
-  const safeTons = isNaN(projectedTons) || projectedTons === null || projectedTons === undefined ? 0 : projectedTons;
-  const safeStreak = isNaN(streak) || streak === null ? 0 : streak;
+  const safeTons   = isNaN(projectedTons) || projectedTons == null ? 0 : projectedTons;
+  const safeStreak = isNaN(streak)        || streak == null        ? 0 : streak;
 
-  const difference = safeTons - GLOBAL_AVERAGE_TONS;
+  const difference  = safeTons - GLOBAL_AVERAGE_TONS;
   const percentDiff = Math.abs((difference / GLOBAL_AVERAGE_TONS) * 100);
-  const isBelow = difference <= 0;
-
-  const streakLabel = `${safeStreak} ${safeStreak === 1 ? 'day' : 'days'} streak`;
-  const comparisonLabel = `${formatNumber(percentDiff)}% ${isBelow ? 'below' : 'above'} global average`;
+  const isBelow     = difference <= 0;
 
   return (
-    <div
-      className="glass p-6 md:p-8 rounded-3xl flex flex-col sm:flex-row gap-6 w-full justify-between items-center transition-all"
-      role="region"
-      aria-label="Your progress summary"
-    >
-      {/* Streak Counter */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" role="region" aria-label="Mission progress summary">
+
+      {/* ── MISSION STREAK ─────────────────────────────────────────── */}
       <div
-        className="relative overflow-hidden flex items-center gap-5 bg-space/80 px-6 py-5 rounded-2xl w-full sm:w-auto flex-1 border border-cardBorder group hover:border-electric transition-colors"
-        aria-label={`Current logging streak: ${streakLabel}`}
+        className="glass rounded-2xl p-6 flex items-center gap-5 group transition-all duration-300 cursor-default"
+        style={{ borderColor: '#FFB547', boxShadow: '0 0 20px rgba(255,181,71,0.25), inset 0 0 20px rgba(255,181,71,0.04)' }}
+        aria-label={`Mission streak: ${safeStreak} ${safeStreak === 1 ? 'day' : 'days'}`}
       >
-        <div className="absolute inset-0 bg-electric/5 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></div>
-        <div className="p-3.5 bg-electric/10 text-electric rounded-xl border border-electric/30 shadow-[0_0_10px_rgba(0,255,135,0.2)] z-10">
-          <Flame size={28} aria-hidden="true" className="drop-shadow-[0_0_8px_rgba(0,255,135,0.8)]" />
+        {/* Scan line */}
+        <div className="scan-line" aria-hidden="true" />
+
+        <div className="p-3 rounded-xl shrink-0"
+          style={{ background: 'rgba(255,181,71,0.1)', border: '1px solid rgba(255,181,71,0.3)' }}>
+          <Flame size={28} aria-hidden="true" style={{ color: '#FFB547', filter: 'drop-shadow(0 0 8px #FFB547)' }} />
         </div>
-        <div className="flex flex-col z-10">
-          <h3 className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-0.5 font-inter">Current Streak</h3>
-          <p className="text-3xl font-black text-electric font-orbitron drop-shadow-[0_0_5px_rgba(0,255,135,0.5)]" aria-hidden="true">
-            {safeStreak}{' '}
-            <span className="text-xl font-semibold opacity-70 font-inter text-electric/70">
-              {safeStreak === 1 ? 'day' : 'days'}
+
+        <div className="flex flex-col">
+          <span className="mono-label" style={{ color: '#FFB547', opacity: 0.8 }}>MISSION STREAK</span>
+          <div className="flex items-end gap-2 mt-1">
+            <span
+              className="text-4xl font-black font-orbitron"
+              style={{ color: '#FFB547', textShadow: '0 0 12px rgba(255,181,71,0.6)' }}
+              aria-hidden="true"
+            >
+              <CountUp target={safeStreak} />
             </span>
-          </p>
+            <span className="font-mono text-sm mb-1" style={{ color: 'rgba(255,181,71,0.6)' }}>
+              {safeStreak === 1 ? 'DAY' : 'DAYS'}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Comparison against global average */}
+      {/* ── EMISSIONS VS BENCHMARK ─────────────────────────────────── */}
       <div
-        className={`relative overflow-hidden flex items-center gap-5 px-6 py-5 rounded-2xl w-full sm:w-auto flex-1 border border-cardBorder group transition-colors ${isBelow ? 'hover:border-cyan' : 'hover:border-coral'}`}
-        aria-label={`Performance vs global average: ${comparisonLabel}`}
+        className="glass rounded-2xl p-6 flex items-center gap-5 group transition-all duration-300 cursor-default overflow-hidden"
+        style={{
+          borderColor: isBelow ? '#00D4FF' : '#FF4D6D',
+          boxShadow: isBelow
+            ? '0 0 20px rgba(0,212,255,0.25), inset 0 0 20px rgba(0,212,255,0.04)'
+            : '0 0 20px rgba(255,77,109,0.25), inset 0 0 20px rgba(255,77,109,0.04)',
+        }}
+        aria-label={`Emissions vs global benchmark: ${formatNumber(percentDiff)}% ${isBelow ? 'below' : 'above'} average`}
       >
-        <div
-          className={`absolute inset-0 opacity-20 animate-shimmer ${isBelow ? 'from-cyan' : 'from-coral'} bg-gradient-to-r via-transparent to-transparent`}
-          aria-hidden="true"
-        ></div>
-        <div className={`p-3.5 rounded-xl border z-10 shadow-lg ${isBelow ? 'bg-cyan/10 text-cyan border-cyan/30 shadow-[0_0_10px_rgba(0,212,255,0.2)]' : 'bg-coral/10 text-coral border-coral/30 shadow-[0_0_10px_rgba(255,77,109,0.2)]'}`}>
+        {/* Shimmer overlay */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true"
+          style={{
+            background: isBelow
+              ? 'linear-gradient(90deg, transparent 0%, #00D4FF 50%, transparent 100%)'
+              : 'linear-gradient(90deg, transparent 0%, #FF4D6D 50%, transparent 100%)',
+            backgroundSize: '200% 100%',
+            animation: 'shimmer 3s linear infinite',
+          }} />
+
+        <div className="p-3 rounded-xl shrink-0" style={{
+          background: isBelow ? 'rgba(0,212,255,0.1)' : 'rgba(255,77,109,0.1)',
+          border: isBelow ? '1px solid rgba(0,212,255,0.3)' : '1px solid rgba(255,77,109,0.3)',
+        }}>
           {isBelow
-            ? <TrendingDown size={28} aria-hidden="true" className="drop-shadow-[0_0_8px_rgba(0,212,255,0.8)]" />
-            : <TrendingUp size={28} aria-hidden="true" className="drop-shadow-[0_0_8px_rgba(255,77,109,0.8)]" />}
+            ? <TrendingDown size={28} aria-hidden="true" style={{ color: '#00D4FF', filter: 'drop-shadow(0 0 8px #00D4FF)' }}/>
+            : <TrendingUp   size={28} aria-hidden="true" style={{ color: '#FF4D6D', filter: 'drop-shadow(0 0 8px #FF4D6D)' }}/>}
         </div>
-        <div className="flex flex-col z-10">
-          <h3 className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-0.5 font-inter">Vs Global Avg</h3>
-          <p className={`text-2xl font-black font-orbitron drop-shadow-md ${isBelow ? 'text-cyan' : 'text-coral'}`} aria-hidden="true">
-            {formatNumber(percentDiff)}%{' '}
-            <span className="text-lg font-semibold opacity-70 font-inter">
-              {isBelow ? 'below' : 'above'}
+
+        <div className="flex flex-col">
+          <span className="mono-label" style={{ color: isBelow ? '#00D4FF' : '#FF4D6D', opacity: 0.8 }}>
+            EMISSIONS VS GLOBAL BENCHMARK
+          </span>
+          <div className="flex items-end gap-2 mt-1">
+            <span className="text-3xl font-black font-orbitron" aria-hidden="true" style={{
+              color: isBelow ? '#00D4FF' : '#FF4D6D',
+              textShadow: isBelow ? '0 0 12px rgba(0,212,255,0.6)' : '0 0 12px rgba(255,77,109,0.6)',
+            }}>
+              {formatNumber(percentDiff)}%
             </span>
-          </p>
+            <span className="font-mono text-sm mb-1" style={{ color: isBelow ? 'rgba(0,212,255,0.6)' : 'rgba(255,77,109,0.6)' }}>
+              {isBelow ? 'BELOW ↓' : 'ABOVE ↑'}
+            </span>
+          </div>
         </div>
       </div>
+
     </div>
   );
 };
 
 WeeklyProgress.propTypes = {
-  streak: PropTypes.number.isRequired,
+  streak:        PropTypes.number.isRequired,
   projectedTons: PropTypes.number.isRequired,
 };
 

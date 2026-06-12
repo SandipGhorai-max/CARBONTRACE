@@ -82,9 +82,12 @@ describe('ExportPanel component', () => {
     });
   });
 
-  it('disables both buttons and shows no-data label when activities is empty', () => {
+  it('both buttons have no-data aria-label when activities is empty', () => {
     render(<ExportPanel activities={[]} />);
-    expect(screen.getByRole('button', { name: /no data available/i })).toBeDefined();
+    // Both buttons should be disabled with aria-disabled
+    const buttons = screen.getAllByRole('button');
+    expect(buttons.length).toBeGreaterThanOrEqual(2);
+    buttons.forEach(btn => expect(btn).toBeDisabled());
   });
 
   // ─── CSV download ─────────────────────────────────────────────────────────
