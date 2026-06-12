@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarbonTrace - Standalone</title>
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            slate: { 50: '#F8FAFC', 800: '#1E293B', 900: '#0F172A' },
+            teal: { 600: '#0D9488' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- React & ReactDOM via CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Babel for in-browser JSX compilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Lucide Icons via CDN (using a lightweight script version) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useReducer, useContext, createContext, useMemo, useCallback, Suspense, memo } = React;
+
+    // --- Constants ---
+    const CATEGORIES = {
+      TRANSPORT: 'Transport', FOOD: 'Food', ENERGY: 'Energy', SHOPPING: 'Shopping',
+    };
+
+    const CARBON_FACTORS = {
+      [CATEGORIES.TRANSPORT]: {
+        car: { value: 0.4, unit: 'kg/mile', label: 'Car (miles)' },
+        bus: { value: 0.1, unit: 'kg/mile', label: 'Bus (miles)' },
+        flight: { value: 0.2, unit: 'kg/mile', label: 'Flight (miles)' }
+      },
+      [CATEGORIES.FOOD]: {
+        meat: { value: 2.5, unit: 'kg/meal', label: 'Meat-based meal' },
+        vegetarian: { value: 0.8, unit: 'kg/meal', label: 'Vegetarian meal' },
+        vegan: { value: 0.4, unit: 'kg/meal', label: 'Vegan meal' }
+      },
+      [CATEGORIES.ENERGY]: {
+        electricity: { value: 0.4, unit: 'kg/kWh', label: 'Electricity (kWh)' },
+        heating: { value: 0.2, unit: 'kg/kWh', label: 'Heating (kWh)' }
+      },
+      [CATEGORIES.SHOPPING]: {
+        clothing: { value: 15.0, unit: 'kg/item', label: 'Clothing (item)' },
+        electronics: { value: 50.0, unit: 'kg/item', label: 'Electronics (item)' }
+      }
+    };
+    const GLOBAL_AVERAGE_TONS = 4.0;
+    const PARIS_AGREEMENT_TONS = 2.0;
+
+    // --- Utils ---
+    const calculateActivityCO2 = (category, type, amount) => {
+      if (amount < 0 || isNaN(amount) || amount === null) return 0;
+      const factor = CARBON_FACTORS[category]?.[type]?.value || 0;
+      return factor * amount;
+    };
+    const summarizeByCategory = (activities = []) => activities.reduce((acc, act) => {
+      acc[act.category] = (acc[act.category] || 0) + (act.co2 || 0); return acc;
+    }, {});
+    const getHighestImpactCategory = (summary = {}) => {
+      const entries = Object.entries(summary);
+      if (entries.length === 0) return null;
+      return entries.reduce((max, curr) => curr[1] > max[1] ? curr : max)[0];
+    };
+    const calculateAnnualProjection = (totalKg, daysLogged) => {
+      if (daysLogged <= 0 || totalKg <= 0 || isNaN(totalKg) || isNaN(daysLogged)) return 0;
+      return (totalKg / daysLogged) * 365 / 1000;
+    };
+    const formatNumber = (value, decimals = 2) => {
+      if (value === null || value === undefined || isNaN(value)) return '0.00';
+      return Number(value).toFixed(decimals);
+    };
+
+    // --- Context & Hook ---
+    const initialState = { activities: [], streak: 0, lastLoginDate: null };
+    const CarbonContext = createContext(initialState);
+    const carbonReducer = (state, action) => {
+      switch (action.type) {
+        case 'LOAD_DATA': return { ...state, ...action.payload };
+        case 'ADD_ACTIVITY': return { ...state, activities: [action.payload, ...state.activities] };
+        case 'UPDATE_STREAK': return { ...state, streak: action.payload.streak, lastLoginDate: action.payload.lastLoginDate };
+        default: return state;
+      }
+    };
+
+    const CarbonProvider = ({ children }) => {
+      const [state, dispatch] = useReducer(carbonReducer, initialState);
+      useEffect(() => {
+        const saved = localStorage.getItem('carbonTraceData');
+        let loadedState = initialState;
+        if (saved) {
+          try { loadedState = JSON.parse(saved); dispatch({ type: 'LOAD_DATA', payload: loadedState }); } catch (e) {}
+        }
+        const today = new Date().toISOString().split('T')[0];
+        if (loadedState.lastLoginDate !== today) {
+          let newStreak = loadedState.streak;
+          if (loadedState.lastLoginDate) {
+            const diffDays = Math.ceil(Math.abs(new Date(today) - new Date(loadedState.lastLoginDate)) / (1000 * 60 * 60 * 24));
+            if (diffDays === 1) newStreak += 1; else if (diffDays > 1) newStreak = 1;
+          } else newStreak = 1;
+          dispatch({ type: 'UPDATE_STREAK', payload: { streak: newStreak, lastLoginDate: today } });
+        }
+      }, []);
+      useEffect(() => { localStorage.setItem('carbonTraceData', JSON.stringify(state)); }, [state]);
+      return <CarbonContext.Provider value={{ state, dispatch }}>{children}</CarbonContext.Provider>;
+    };
+
+    const useCarbon = () => {
+      const { state, dispatch } = useContext(CarbonContext);
+      const addActivity = useCallback((activity) => {
+        dispatch({
+          type: 'ADD_ACTIVITY',
+          payload: { ...activity, id: Math.random().toString(36).substring(7), date: new Date().toISOString(), co2: calculateActivityCO2(activity.category, activity.type, activity.amount) }
+        });
+      }, [dispatch]);
+      const summary = useMemo(() => summarizeByCategory(state.activities), [state.activities]);
+      const totalCO2Kg = useMemo(() => Object.values(summary).reduce((sum, val) => sum + val, 0), [summary]);
+      const daysLogged = useMemo(() => Math.max(1, new Set(state.activities.map(a => a.date.split('T')[0])).size), [state.activities]);
+      return {
+        activities: state.activities, streak: state.streak, summary,
+        highestImpactCategory: useMemo(() => getHighestImpactCategory(summary), [summary]),
+        totalCO2Kg, projectedAnnualTons: useMemo(() => calculateAnnualProjection(totalCO2Kg, daysLogged), [totalCO2Kg, daysLogged]),
+        addActivity
+      };
+    };
+
+    // --- Components ---
+    const Icon = ({ name, size = 24, className = "" }) => {
+      const iconRef = React.useRef(null);
+      useEffect(() => { if (window.lucide && iconRef.current) window.lucide.createIcons({ icons: { [name]: window.lucide.icons[name] }, root: iconRef.current.parentNode }); }, [name]);
+      return <i ref={iconRef} data-lucide={name} style={{ width: size, height: size }} className={className}></i>;
+    };
+
+    const WeeklyProgress = memo(({ streak, projectedTons }) => {
+      const difference = projectedTons - GLOBAL_AVERAGE_TONS;
+      const percentDiff = Math.abs((difference / GLOBAL_AVERAGE_TONS) * 100);
+      const isBelow = difference <= 0;
+      return (
+        <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col sm:flex-row gap-6 w-full justify-between items-center transition-all">
+          <div className="flex items-center gap-5 bg-orange-50/80 px-6 py-5 rounded-2xl w-full sm:w-auto flex-1 border border-orange-100/50">
+            <div className="p-3.5 bg-orange-100 text-orange-500 rounded-xl shadow-sm"><Icon name="Flame" size={28} /></div>
+            <div className="flex flex-col">
+              <h3 className="text-orange-900/60 text-xs font-bold uppercase tracking-widest mb-0.5">Current Streak</h3>
+              <p className="text-3xl font-extrabold text-orange-600">{streak} <span className="text-xl font-semibold opacity-70">{streak === 1 ? 'day' : 'days'}</span></p>
+            </div>
+          </div>
+          <div className={`flex items-center gap-5 px-6 py-5 rounded-2xl w-full sm:w-auto flex-1 border ${isBelow ? 'bg-teal-50/80 border-teal-100/50' : 'bg-rose-50/80 border-rose-100/50'}`}>
+            <div className={`p-3.5 rounded-xl shadow-sm ${isBelow ? 'bg-teal-100 text-teal-600' : 'bg-rose-100 text-rose-600'}`}>
+              <Icon name={isBelow ? "TrendingDown" : "TrendingUp"} size={28} />
+            </div>
+            <div className="flex flex-col">
+              <h3 className={`text-xs font-bold uppercase tracking-widest mb-0.5 ${isBelow ? 'text-teal-900/60' : 'text-rose-900/60'}`}>Vs Global Avg</h3>
+              <p className={`text-2xl font-extrabold ${isBelow ? 'text-teal-600' : 'text-rose-600'}`}>
+                {formatNumber(percentDiff)}% <span className="text-lg font-semibold opacity-70">{isBelow ? 'below' : 'above'}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    });
+
+    const ActivityForm = () => {
+      const { addActivity } = useCarbon();
+      const [category, setCategory] = useState(CATEGORIES.TRANSPORT);
+      const [type, setType] = useState(Object.keys(CARBON_FACTORS[CATEGORIES.TRANSPORT])[0]);
+      const [amount, setAmount] = useState('');
+      const [error, setError] = useState('');
+
+      useEffect(() => { setType(Object.keys(CARBON_FACTORS[category])[0]); }, [category]);
+
+      const handleSubmit = (e) => {
+        e.preventDefault(); setError('');
+        const numAmount = parseFloat(amount);
+        if (isNaN(numAmount) || numAmount <= 0) return setError('Amount must be greater than zero.');
+        addActivity({ category, type, amount: numAmount });
+        setAmount('');
+      };
+
+      return (
+        <form onSubmit={handleSubmit} className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col gap-5 w-full">
+          <h2 className="text-2xl font-bold text-slate-800">Log Activity</h2>
+          {error && <div className="p-4 bg-rose-50 text-rose-700 rounded-xl text-sm flex items-start gap-3 border border-rose-100">{error}</div>}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-slate-700">Category</label>
+            <select value={category} onChange={e => setCategory(e.target.value)} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 outline-none">
+              {Object.values(CATEGORIES).map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-slate-700">Activity Type</label>
+            <select value={type} onChange={e => setType(e.target.value)} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 outline-none">
+              {Object.entries(CARBON_FACTORS[category]).map(([k, d]) => <option key={k} value={k}>{d.label}</option>)}
+            </select>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-slate-700">Amount ({CARBON_FACTORS[category][type].unit.split('/')[1]})</label>
+            <input type="number" step="any" min="0" value={amount} onChange={e => setAmount(e.target.value)} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 outline-none" />
+          </div>
+          <button type="submit" className="mt-4 flex items-center justify-center gap-2 bg-slate-800 text-white p-4 rounded-xl font-semibold outline-none"><Icon name="PlusCircle" size={20}/> Log Activity</button>
+        </form>
+      );
+    };
+
+    const PlanetGauge = memo(({ projectedTons }) => {
+      const maxScale = Math.max(GLOBAL_AVERAGE_TONS * 1.5, projectedTons * 1.2, 6);
+      const percentage = Math.min((projectedTons / maxScale) * 100, 100);
+      const radius = 90;
+      const circumference = 2 * Math.PI * radius;
+      const strokeDashoffset = circumference - (percentage / 100) * circumference;
+      const colorClass = projectedTons > GLOBAL_AVERAGE_TONS ? "text-rose-600" : (projectedTons > PARIS_AGREEMENT_TONS ? "text-yellow-500" : "text-teal-600");
+
+      return (
+        <div className="flex flex-col items-center justify-center p-8 bg-white rounded-3xl shadow-sm border border-slate-100 w-full">
+          <div className="relative flex items-center justify-center w-64 h-64">
+            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
+              <circle cx="100" cy="100" r={radius} className="text-slate-100 stroke-current" strokeWidth="16" fill="transparent" />
+              <circle cx="100" cy="100" r={radius} className={`${colorClass} stroke-current transition-all duration-1000`} strokeWidth="16" fill="transparent" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" />
+            </svg>
+            <div className="absolute flex flex-col items-center justify-center text-center">
+              <span className="text-5xl font-bold text-slate-800">{formatNumber(projectedTons)}</span>
+              <span className="text-sm font-semibold text-slate-500 uppercase mt-1">Tons / Year</span>
+            </div>
+          </div>
+          <div className="mt-8 flex flex-col sm:flex-row gap-4 sm:gap-8 text-sm justify-center">
+            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-teal-600"></span><span className="text-slate-600 font-medium">Paris Target: {PARIS_AGREEMENT_TONS}t</span></div>
+            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-slate-300"></span><span className="text-slate-600 font-medium">Global Avg: {GLOBAL_AVERAGE_TONS}t</span></div>
+          </div>
+        </div>
+      );
+    });
+
+    const ActionSuggestions = memo(({ highestImpactCategory }) => {
+      if (!highestImpactCategory) return <div className="bg-teal-50 p-6 rounded-3xl border border-teal-100 text-teal-800">Log some activities for personalized tips.</div>;
+      const tips = {
+        [CATEGORIES.TRANSPORT]: ["Use public transport.", "Combine errands.", "Walk or cycle short distances."],
+        [CATEGORIES.FOOD]: ["Swap one meat meal for plant-based.", "Buy local.", "Minimize food waste."],
+        [CATEGORIES.ENERGY]: ["Switch to LEDs.", "Adjust thermostat.", "Unplug unused electronics."],
+        [CATEGORIES.SHOPPING]: ["Buy second-hand.", "Repair electronics.", "Choose minimal packaging."]
+      }[highestImpactCategory];
+      
+      return (
+        <div className="bg-slate-800 p-6 rounded-3xl text-white shadow-lg">
+          <h2 className="text-xl font-bold mb-4">Action Plan: {highestImpactCategory}</h2>
+          <ul className="flex flex-col gap-4">
+            {tips.map((tip, i) => (
+              <li key={i} className="flex gap-3 items-start bg-white/10 p-4 rounded-xl text-slate-200">
+                <span className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-400 font-bold flex items-center justify-center shrink-0">{i+1}</span> {tip}
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    });
+
+    const Dashboard = () => {
+      const { streak, highestImpactCategory, projectedAnnualTons } = useCarbon();
+      return (
+        <main className="max-w-6xl mx-auto p-4 md:p-8 flex flex-col gap-8">
+          <header className="mb-2 mt-4"><h1 className="text-4xl font-extrabold text-slate-900">Carbon<span className="text-teal-600">Trace</span></h1></header>
+          <WeeklyProgress streak={streak} projectedTons={projectedAnnualTons} />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-7 flex flex-col gap-8"><ActivityForm /><ActionSuggestions highestImpactCategory={highestImpactCategory} /></div>
+            <div className="lg:col-span-5 flex flex-col gap-8"><PlanetGauge projectedTons={projectedAnnualTons} /></div>
+          </div>
+        </main>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<CarbonProvider><Dashboard /></CarbonProvider>);
+  </script>
+</body>
+</html>
