@@ -5,7 +5,7 @@ import { useCarbon } from '../hooks/useCarbon';
 import { trackEvent } from '../firebase';
 import { Send, AlertCircle } from 'lucide-react';
 
-const ActivityForm = () => {
+const ActivityForm = ({ onTransmit }) => {
   const { addActivity } = useCarbon();
   const [category, setCategory] = useState(CATEGORIES.TRANSPORT);
   const [type, setType] = useState(Object.keys(CARBON_FACTORS[CATEGORIES.TRANSPORT])[0]);
@@ -32,6 +32,7 @@ const ActivityForm = () => {
     trackEvent('activity_logged', { category, type, amount: numAmount });
     setAmount('');
     setSuccess(true);
+    if (onTransmit) onTransmit();
     setTimeout(() => setSuccess(false), 2000);
   };
 

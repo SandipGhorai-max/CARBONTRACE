@@ -118,13 +118,13 @@ describe('calculations.js', () => {
 
   // ─── calculateAnnualProjection ────────────────────────────────────────────
   describe('calculateAnnualProjection', () => {
-    it('calculates annual projection correctly (happy path)', () => {
-      // 10kg over 1 day → 10 * 365 / 1000 = 3.65 tonnes
-      expect(calculateAnnualProjection(10, 1)).toBe(3.65);
+    it('calculates annual projection correctly with 7-day minimum (happy path)', () => {
+      // 10kg over 1 day → effectiveDays = max(1,7) = 7 → 10/7 * 365 / 1000 ≈ 0.5214
+      expect(calculateAnnualProjection(10, 1)).toBeCloseTo(0.5214, 3);
     });
 
-    it('distributes across multiple days (happy path)', () => {
-      // 100kg over 10 days → 10kg/day → 10 * 365 / 1000 = 3.65 tonnes
+    it('distributes across multiple days when above 7 (happy path)', () => {
+      // 100kg over 10 days → effectiveDays = 10 → 10kg/day → 10 * 365 / 1000 = 3.65 tonnes
       expect(calculateAnnualProjection(100, 10)).toBe(3.65);
     });
 

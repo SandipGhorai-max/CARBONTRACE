@@ -55,7 +55,11 @@ export const calculateAnnualProjection = (totalKg, daysLogged) => {
   ) {
     return 0;
   }
-  const dailyAverageKg = totalKg / daysLogged;
+  // Use at least 7 days for averaging to prevent massive extrapolation
+  // from a single day of logging.  As more days are logged the estimate
+  // becomes progressively more accurate.
+  const effectiveDays = Math.max(daysLogged, 7);
+  const dailyAverageKg = totalKg / effectiveDays;
   const annualKg = dailyAverageKg * 365;
   return annualKg / 1000; // convert to metric tonnes
 };

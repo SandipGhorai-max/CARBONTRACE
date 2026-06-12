@@ -100,8 +100,8 @@ describe('useCarbon.js', () => {
     expect(result.current.totalCO2Kg).toBe(9.0);
     expect(result.current.highestImpactCategory).toBe(CATEGORIES.FOOD);
     // All activities happen on the same day → daysLogged = 1
-    // 9kg/day * 365 / 1000 = 3.285 tonnes
-    expect(result.current.projectedAnnualTons).toBeCloseTo(3.285, 3);
+    // effectiveDays = max(1,7) = 7 → 9/7 * 365 / 1000 ≈ 0.4693 tonnes
+    expect(result.current.projectedAnnualTons).toBeCloseTo(0.4693, 3);
   });
 
   it('returns 0 for projectedAnnualTons when there are no activities (edge case)', async () => {

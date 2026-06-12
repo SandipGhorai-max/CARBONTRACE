@@ -1,44 +1,20 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useState } from 'react';
 import { useCarbon } from '../hooks/useCarbon';
+import { useSoundEngine } from '../hooks/useSoundEngine';
 import ActivityForm from './ActivityForm';
 import ActionSuggestions from './ActionSuggestions';
 import WeeklyProgress from './WeeklyProgress';
 import ExportPanel from './ExportPanel';
 import PlanetPowerBar from './PlanetPowerBar';
+import NeuralNetworkCard from './NeuralNetworkCard';
+import OptimizationProtocols from './OptimizationProtocols';
+import MissionDebrief from './MissionDebrief';
+import AIRobot from './AIRobot';
+import HolographicGlobe from './HolographicGlobe';
 import ErrorBoundary from './ErrorBoundary';
+import { Volume2, VolumeX } from 'lucide-react';
 
 const PlanetGauge = lazy(() => import('./PlanetGauge'));
-
-/* ── AI Robot Head (pure CSS/SVG) ─────────────────────────────────────────── */
-const AIRobot = () => (
-  <div className="relative flex-shrink-0" aria-hidden="true" style={{ width: 52, height: 52 }}>
-    <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" width="52" height="52">
-      {/* Antenna */}
-      <line x1="26" y1="2" x2="26" y2="10" stroke="#00D4FF" strokeWidth="2" strokeLinecap="round"/>
-      <circle cx="26" cy="2" r="2" fill="#00FF87" className="animate-pulse-dot"/>
-      {/* Head body */}
-      <rect x="8" y="10" width="36" height="28" rx="6" fill="rgba(10,22,40,0.9)" stroke="#00D4FF" strokeWidth="1.5"/>
-      {/* Eyes */}
-      <rect x="13" y="18" width="10" height="7" rx="2" fill="#00FF87" className="animate-eyes-pulse"
-        style={{ filter: 'drop-shadow(0 0 4px #00FF87) drop-shadow(0 0 8px #00FF87)' }}/>
-      <rect x="29" y="18" width="10" height="7" rx="2" fill="#00FF87" className="animate-eyes-pulse"
-        style={{ filter: 'drop-shadow(0 0 4px #00FF87) drop-shadow(0 0 8px #00FF87)', animationDelay: '0.3s' }}/>
-      {/* Pupils */}
-      <rect x="16" y="20" width="4" height="3" rx="1" fill="#020917"/>
-      <rect x="32" y="20" width="4" height="3" rx="1" fill="#020917"/>
-      {/* Mouth grill */}
-      {[0,1,2,3].map(i => (
-        <line key={i} x1={14 + i*7} y1="31" x2={14 + i*7} y2="34"
-          stroke="#00D4FF" strokeWidth="1.5" strokeLinecap="round" opacity="0.7"/>
-      ))}
-      {/* Chin */}
-      <rect x="20" y="38" width="12" height="4" rx="2" fill="rgba(10,22,40,0.9)" stroke="#1A3A5C" strokeWidth="1"/>
-      {/* Ears */}
-      <rect x="4" y="18" width="4" height="8" rx="2" fill="rgba(10,22,40,0.9)" stroke="#00D4FF" strokeWidth="1"/>
-      <rect x="44" y="18" width="4" height="8" rx="2" fill="rgba(10,22,40,0.9)" stroke="#00D4FF" strokeWidth="1"/>
-    </svg>
-  </div>
-);
 
 /* ── Blinking cursor ──────────────────────────────────────────────────────── */
 const BlinkCursor = () => (
@@ -55,17 +31,25 @@ const LiveBadge = () => (
 
 const Dashboard = () => {
   const { streak, highestImpactCategory, projectedAnnualTons, activities } = useCarbon();
+  const { muted, toggleMute, playBeep } = useSoundEngine();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleDataTransmit = () => {
+    setIsProcessing(true);
+    playBeep();
+    setTimeout(() => setIsProcessing(false), 1500);
+  };
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 md:py-10 flex flex-col gap-8">
 
       {/* ── HEADER ─────────────────────────────────────────────────────── */}
       <header className="animate-slide-up" style={{ animationFillMode: 'both' }}>
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
           {/* Left: robot + title */}
-          <div className="flex items-center gap-4">
-            <AIRobot />
-            <div>
+          <div className="flex items-start gap-4">
+            <AIRobot co2Tons={projectedAnnualTons} isProcessing={isProcessing} />
+            <div className="pt-2" style={{ marginLeft: '14rem' }}>
               <h1
                 className="text-4xl md:text-6xl font-black font-orbitron uppercase tracking-tight"
                 style={{
@@ -74,6 +58,7 @@ const Dashboard = () => {
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
                   filter: 'drop-shadow(0 0 20px rgba(0,255,135,0.4))',
+                  textShadow: '0 0 20px currentColor',
                 }}
               >
                 CarbonTrace
@@ -84,9 +69,20 @@ const Dashboard = () => {
               </p>
             </div>
           </div>
-          {/* Right: LIVE badge */}
+          {/* Right: Globe + LIVE + Mute */}
           <div className="flex items-center gap-3">
+            <HolographicGlobe co2Tons={projectedAnnualTons} />
             <LiveBadge />
+            <button onClick={toggleMute}
+              className="p-2 rounded-lg border transition-all"
+              style={{
+                background: 'rgba(10,22,40,0.8)',
+                borderColor: muted ? '#1A3A5C' : '#00FF8744',
+                color: muted ? '#4A7A9B' : '#00FF87',
+              }}
+              aria-label={muted ? 'Unmute sounds' : 'Mute sounds'}>
+              {muted ? <VolumeX size={16}/> : <Volume2 size={16}/>}
+            </button>
           </div>
         </div>
 
@@ -105,21 +101,27 @@ const Dashboard = () => {
       {/* ── MAIN GRID ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
 
-        {/* LEFT: Form + Suggestions */}
+        {/* LEFT: Form + Protocols + Suggestions */}
         <div className="lg:col-span-7 flex flex-col gap-6 md:gap-8">
           <section aria-label="Log new activity"
             className="animate-slide-up" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
             <ErrorBoundary>
-              <ActivityForm />
+              <ActivityForm onTransmit={handleDataTransmit} />
             </ErrorBoundary>
           </section>
+
+          <section aria-label="AI Optimization Protocols"
+            className="animate-slide-up" style={{ animationDelay: '0.25s', animationFillMode: 'both' }}>
+            <OptimizationProtocols />
+          </section>
+
           <section aria-label="Personalised action suggestions"
             className="animate-slide-up" style={{ animationDelay: '0.3s', animationFillMode: 'both' }}>
             <ActionSuggestions highestImpactCategory={highestImpactCategory} />
           </section>
         </div>
 
-        {/* RIGHT: Gauge + Power Bar + Export */}
+        {/* RIGHT: Gauge + Neural Network + Power Bar + Export */}
         <div className="lg:col-span-5 flex flex-col gap-6 md:gap-8">
           <section aria-label="Reactor core — carbon gauge"
             className="animate-slide-up" style={{ animationDelay: '0.4s', animationFillMode: 'both' }}>
@@ -130,6 +132,11 @@ const Dashboard = () => {
             }>
               <PlanetGauge projectedTons={projectedAnnualTons} />
             </Suspense>
+          </section>
+
+          <section aria-label="AI Neural Network Status"
+            className="animate-slide-up" style={{ animationDelay: '0.45s', animationFillMode: 'both' }}>
+            <NeuralNetworkCard />
           </section>
 
           <section aria-label="Planet power level"
@@ -143,6 +150,12 @@ const Dashboard = () => {
           </section>
         </div>
       </div>
+
+      {/* ── MISSION DEBRIEF (full width) ───────────────────────────────── */}
+      <section aria-label="Mission Debrief"
+        className="animate-slide-up" style={{ animationDelay: '0.7s', animationFillMode: 'both' }}>
+        <MissionDebrief activities={activities} />
+      </section>
     </main>
   );
 };

@@ -164,3 +164,34 @@
   .border-neon-amber { border-color: #FFB547; box-shadow: 0 0 20px rgba(255,181,71,0.4), inset 0 0 20px rgba(255,181,71,0.04); }
   .border-neon-coral { border-color: #FF4D6D; box-shadow: 0 0 20px rgba(255,77,109,0.4), inset 0 0 20px rgba(255,77,109,0.04); }
 }
+
+/* ── Extra keyframes (not in tailwind config) ──────────────────────────── */
+
+/* Aurora / nebula background wave */
+@keyframes auroraMove {
+  0%   { transform: translateX(-5%) translateY(5%) scale(1); }
+  50%  { transform: translateX(5%) translateY(-5%) scale(1.05); }
+  100% { transform: translateX(-5%) translateY(5%) scale(1); }
+}
+
+/* Matrix falling characters */
+@keyframes matrixFall {
+  0%   { transform: translateY(-120vh); }
+  100% { transform: translateY(120vh); }
+}
+
+/* CO₂ molecule rising */
+@keyframes moleculeRise {
+  0%   { transform: translateY(0) rotate(30deg); opacity: var(--mol-opacity, 0.04); }
+  80%  { opacity: var(--mol-opacity, 0.04); }
+  100% { transform: translateY(-120vh) rotate(390deg); opacity: 0; }
+}
+
+/* Lightning bolt arc between cards */
+@keyframes lightningArc {
+  0%, 95%, 100% { opacity: 0; }
+  96%  { opacity: 0.6; }
+  97%  { opacity: 0; }
+  98%  { opacity: 0.4; }
+  99%  { opacity: 0; }
+}
