@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import ActivityForm from '../components/ActivityForm';
 import { CarbonProvider } from '../context/CarbonContext';
 import { CATEGORIES, CARBON_FACTORS } from '../constants/carbonFactors';
@@ -11,29 +11,27 @@ beforeEach(() => {
   console.warn = () => {};
   localStorage.clear();
 });
-
 afterEach(() => {
   console.warn = originalWarn;
 });
 
-const renderWithProvider = (ui) =>
-  render(<CarbonProvider>{ui}</CarbonProvider>);
+const renderWithProvider = (ui) => render(<CarbonProvider>{ui}</CarbonProvider>);
 
 describe('ActivityForm component', () => {
 
   // ─── Render ───────────────────────────────────────────────────────────────
-  it('renders all form fields and submit button (happy path)', () => {
+  it('renders all form fields and the transmit button (happy path)', () => {
     renderWithProvider(<ActivityForm />);
-
     expect(screen.getByLabelText(/category/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/activity type/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/amount/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /submit and log/i })).toBeInTheDocument();
+    // Button has aria-label "Transmit carbon activity data"
+    expect(screen.getByRole('button', { name: /transmit/i })).toBeInTheDocument();
   });
 
-  it('renders the heading "Log Activity" (happy path)', () => {
+  it('renders the "REPORT FIELD DATA" heading (happy path)', () => {
     renderWithProvider(<ActivityForm />);
-    expect(screen.getByRole('heading', { name: /log activity/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /report field data/i })).toBeInTheDocument();
   });
 
   // ─── Category change ─────────────────────────────────────────────────────
@@ -43,7 +41,6 @@ describe('ActivityForm component', () => {
     const categorySelect = screen.getByLabelText(/category/i);
     fireEvent.change(categorySelect, { target: { value: CATEGORIES.FOOD } });
 
-    const typeSelect = screen.getByLabelText(/activity type/i);
     const foodTypes = Object.values(CARBON_FACTORS[CATEGORIES.FOOD]).map((f) => f.label);
     foodTypes.forEach((label) => {
       expect(screen.getByText(label)).toBeInTheDocument();
@@ -67,7 +64,7 @@ describe('ActivityForm component', () => {
   it('shows error for empty amount on submit (validation)', async () => {
     renderWithProvider(<ActivityForm />);
 
-    fireEvent.click(screen.getByRole('button', { name: /submit and log/i }));
+    fireEvent.click(screen.getByRole('button', { name: /transmit/i }));
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toBeInTheDocument();
@@ -79,7 +76,7 @@ describe('ActivityForm component', () => {
     renderWithProvider(<ActivityForm />);
 
     fireEvent.change(screen.getByLabelText(/amount/i), { target: { value: 'abc' } });
-    fireEvent.click(screen.getByRole('button', { name: /submit and log/i }));
+    fireEvent.click(screen.getByRole('button', { name: /transmit/i }));
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent(/valid number/i);
@@ -90,7 +87,7 @@ describe('ActivityForm component', () => {
     renderWithProvider(<ActivityForm />);
 
     fireEvent.change(screen.getByLabelText(/amount/i), { target: { value: '0' } });
-    fireEvent.click(screen.getByRole('button', { name: /submit and log/i }));
+    fireEvent.click(screen.getByRole('button', { name: /transmit/i }));
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent(/greater than zero/i);
@@ -101,7 +98,7 @@ describe('ActivityForm component', () => {
     renderWithProvider(<ActivityForm />);
 
     fireEvent.change(screen.getByLabelText(/amount/i), { target: { value: '99999' } });
-    fireEvent.click(screen.getByRole('button', { name: /submit and log/i }));
+    fireEvent.click(screen.getByRole('button', { name: /transmit/i }));
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent(/unrealistically high/i);
@@ -114,7 +111,7 @@ describe('ActivityForm component', () => {
 
     const amountInput = screen.getByLabelText(/amount/i);
     fireEvent.change(amountInput, { target: { value: '15' } });
-    fireEvent.click(screen.getByRole('button', { name: /submit and log/i }));
+    fireEvent.click(screen.getByRole('button', { name: /transmit/i }));
 
     await waitFor(() => {
       expect(amountInput.value).toBe('');
@@ -125,7 +122,7 @@ describe('ActivityForm component', () => {
     renderWithProvider(<ActivityForm />);
 
     fireEvent.change(screen.getByLabelText(/amount/i), { target: { value: '10' } });
-    fireEvent.click(screen.getByRole('button', { name: /submit and log/i }));
+    fireEvent.click(screen.getByRole('button', { name: /transmit/i }));
 
     await waitFor(() => {
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
@@ -136,7 +133,7 @@ describe('ActivityForm component', () => {
   it('marks the amount input aria-invalid when there is an error (a11y)', async () => {
     renderWithProvider(<ActivityForm />);
 
-    fireEvent.click(screen.getByRole('button', { name: /submit and log/i }));
+    fireEvent.click(screen.getByRole('button', { name: /transmit/i }));
 
     await waitFor(() => {
       expect(screen.getByLabelText(/amount/i)).toHaveAttribute('aria-invalid', 'true');
@@ -146,7 +143,7 @@ describe('ActivityForm component', () => {
   it('links error message to amount input via aria-describedby (a11y)', async () => {
     renderWithProvider(<ActivityForm />);
 
-    fireEvent.click(screen.getByRole('button', { name: /submit and log/i }));
+    fireEvent.click(screen.getByRole('button', { name: /transmit/i }));
 
     await waitFor(() => {
       const input = screen.getByLabelText(/amount/i);

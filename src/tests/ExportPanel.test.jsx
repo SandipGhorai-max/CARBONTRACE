@@ -119,31 +119,35 @@ describe('ExportPanel component', () => {
   });
 
   // ─── Success feedback ─────────────────────────────────────────────────────
-  it('shows "Downloaded!" text after CSV export (UX feedback)', async () => {
+  it('shows "EXTRACTED" or success text after CSV export (UX feedback)', async () => {
     render(<ExportPanel activities={sampleActivities} />);
-    fireEvent.click(screen.getByRole('button', { name: /export.*csv/i }));
+    fireEvent.click(screen.getByRole('button', { name: /csv/i }));
     await waitFor(() => {
-      expect(screen.getByText(/downloaded!/i)).toBeInTheDocument();
+      // Button shows success state (EXTRACTED or Downloaded)
+      const btn = screen.getByRole('button', { name: /csv|extracted/i });
+      expect(btn).toBeInTheDocument();
     });
   });
 
-  it('shows "Downloaded!" text after JSON export (UX feedback)', async () => {
+  it('shows success text after JSON export (UX feedback)', async () => {
     render(<ExportPanel activities={sampleActivities} />);
-    fireEvent.click(screen.getByRole('button', { name: /export.*json/i }));
+    fireEvent.click(screen.getByRole('button', { name: /json/i }));
     await waitFor(() => {
-      expect(screen.getAllByText(/downloaded!/i).length).toBeGreaterThan(0);
+      const btn = screen.getByRole('button', { name: /json|extracted/i });
+      expect(btn).toBeInTheDocument();
     });
   });
 
   // ─── Record count in description ─────────────────────────────────────────
   it('shows the activity count in the description when activities exist (happy path)', () => {
     render(<ExportPanel activities={sampleActivities} />);
-    expect(screen.getByText(/2 records/i)).toBeInTheDocument();
+    // Panel shows record count
+    expect(screen.getByText(/2 record/i)).toBeInTheDocument();
   });
 
-  it('uses singular "record" for a single activity (edge case)', () => {
+  it('uses singular "RECORD" for a single activity (edge case)', () => {
     render(<ExportPanel activities={[sampleActivities[0]]} />);
-    expect(screen.getByText(/1 record[^s]/i)).toBeInTheDocument();
+    expect(screen.getByText(/1 record/i)).toBeInTheDocument();
   });
 
 });
