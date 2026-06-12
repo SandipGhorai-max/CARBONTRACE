@@ -1,6 +1,6 @@
 import React from 'react';
 import { renderHook, act } from '@testing-library/react';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { useCarbon } from '../hooks/useCarbon';
 import { CarbonProvider } from '../context/CarbonContext';
 import { CATEGORIES } from '../constants/carbonFactors';
@@ -9,33 +9,42 @@ import { CATEGORIES } from '../constants/carbonFactors';
 
 // Silence expected console.warn from Firebase when running tests
 const originalWarn = console.warn;
+const originalError = console.error;
 beforeEach(() => {
   console.warn = () => {};
   localStorage.clear();
 });
-
 afterEach(() => {
   console.warn = originalWarn;
+  console.error = originalError;
 });
 
 const wrapper = ({ children }) => React.createElement(CarbonProvider, null, children);
 
+// Helper: render the hook and wait for the async LOAD_DATA to finish
+const renderAndWaitForLoad = async () => {
+  const hookResult = renderHook(() => useCarbon(), { wrapper });
+  // Wait for the async loadData effect inside CarbonProvider to settle
+  await act(async () => {
+    // Give time for the async loadFromCloud + LOAD_DATA dispatch
+    await new Promise(resolve => setTimeout(resolve, 50));
+  });
+  return hookResult;
+};
 
 describe('useCarbon.js', () => {
 
   // ─── Provider guard ──────────────────────────────────────────────────────
   it('throws error if used outside provider (failure case)', () => {
-    const originalError = console.error;
     console.error = () => {};
     expect(() => renderHook(() => useCarbon())).toThrow(
       'useCarbon must be used within a CarbonProvider'
     );
-    console.error = originalError;
   });
 
   // ─── addActivity ─────────────────────────────────────────────────────────
   it('adds a single activity and updates state correctly (happy path)', async () => {
-    const { result } = renderHook(() => useCarbon(), { wrapper });
+    const { result } = await renderAndWaitForLoad();
 
     expect(result.current.activities).toEqual([]);
 
@@ -54,7 +63,7 @@ describe('useCarbon.js', () => {
   });
 
   it('handles multiple rapid addActivity calls (edge case)', async () => {
-    const { result } = renderHook(() => useCarbon(), { wrapper });
+    const { result } = await renderAndWaitForLoad();
 
     await act(async () => {
       result.current.addActivity({ category: CATEGORIES.TRANSPORT, type: 'car', amount: 10 });
@@ -68,7 +77,7 @@ describe('useCarbon.js', () => {
   });
 
   it('each activity gets a unique id (edge case)', async () => {
-    const { result } = renderHook(() => useCarbon(), { wrapper });
+    const { result } = await renderAndWaitForLoad();
 
     await act(async () => {
       result.current.addActivity({ category: CATEGORIES.TRANSPORT, type: 'car', amount: 5 });
@@ -81,7 +90,7 @@ describe('useCarbon.js', () => {
 
   // ─── Projections & summary ───────────────────────────────────────────────
   it('calculates projections and highest impact correctly (happy path)', async () => {
-    const { result } = renderHook(() => useCarbon(), { wrapper });
+    const { result } = await renderAndWaitForLoad();
 
     await act(async () => {
       result.current.addActivity({ category: CATEGORIES.TRANSPORT, type: 'car', amount: 10 }); // 4kg
@@ -95,19 +104,19 @@ describe('useCarbon.js', () => {
     expect(result.current.projectedAnnualTons).toBeCloseTo(3.285, 3);
   });
 
-  it('returns 0 for projectedAnnualTons when there are no activities (edge case)', () => {
-    const { result } = renderHook(() => useCarbon(), { wrapper });
+  it('returns 0 for projectedAnnualTons when there are no activities (edge case)', async () => {
+    const { result } = await renderAndWaitForLoad();
     expect(result.current.projectedAnnualTons).toBe(0);
   });
 
-  it('returns null for highestImpactCategory when there are no activities (edge case)', () => {
-    const { result } = renderHook(() => useCarbon(), { wrapper });
+  it('returns null for highestImpactCategory when there are no activities (edge case)', async () => {
+    const { result } = await renderAndWaitForLoad();
     expect(result.current.highestImpactCategory).toBeNull();
   });
 
   // ─── resetData ───────────────────────────────────────────────────────────
   it('resets activities and totalCO2 but preserves streak (happy path)', async () => {
-    const { result } = renderHook(() => useCarbon(), { wrapper });
+    const { result } = await renderAndWaitForLoad();
 
     await act(async () => {
       result.current.addActivity({ category: CATEGORIES.TRANSPORT, type: 'car', amount: 10 });
@@ -128,7 +137,7 @@ describe('useCarbon.js', () => {
 
   // ─── addActivity with invalid amount ─────────────────────────────────────
   it('stores 0 co2 for invalid (NaN) amount (failure case)', async () => {
-    const { result } = renderHook(() => useCarbon(), { wrapper });
+    const { result } = await renderAndWaitForLoad();
 
     await act(async () => {
       result.current.addActivity({ category: CATEGORIES.TRANSPORT, type: 'car', amount: NaN });

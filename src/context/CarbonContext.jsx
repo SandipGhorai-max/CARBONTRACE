@@ -7,7 +7,7 @@ const initialState = {
   lastLoginDate: null,
 };
 
-export const CarbonContext = createContext(initialState);
+export const CarbonContext = createContext(null);
 
 // Stable anonymous session ID — persisted to localStorage so it survives refreshes
 const getSessionId = () => {
