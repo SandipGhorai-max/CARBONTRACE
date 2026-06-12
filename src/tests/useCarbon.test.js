@@ -5,6 +5,8 @@ import { useCarbon } from '../hooks/useCarbon';
 import { CarbonProvider } from '../context/CarbonContext';
 import { CATEGORIES } from '../constants/carbonFactors';
 
+// Use React.createElement instead of JSX so this .js file parses correctly
+
 // Silence expected console.warn from Firebase when running tests
 const originalWarn = console.warn;
 beforeEach(() => {
@@ -16,7 +18,8 @@ afterEach(() => {
   console.warn = originalWarn;
 });
 
-const wrapper = ({ children }) => <CarbonProvider>{children}</CarbonProvider>;
+const wrapper = ({ children }) => React.createElement(CarbonProvider, null, children);
+
 
 describe('useCarbon.js', () => {
 
