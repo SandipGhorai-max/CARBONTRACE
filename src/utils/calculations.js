@@ -1,4 +1,4 @@
-import { CARBON_FACTORS, PROJECTION_MIN_DAYS } from '../constants/carbonFactors';
+import { CARBON_FACTORS, PROJECTION_MIN_DAYS } from '../constants';
 
 /**
  * Calculates total CO2 in kg for a given activity type and amount.

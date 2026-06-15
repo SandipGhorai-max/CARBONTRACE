@@ -1,4 +1,4 @@
-import { useContext, useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useContext } from 'react';
 import { CarbonContext } from '../context/CarbonContext';
 import { calculateActivityCO2, summarizeByCategory, getHighestImpactCategory, calculateAnnualProjection } from '../utils/calculations';
 

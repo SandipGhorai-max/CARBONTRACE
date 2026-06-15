@@ -1,11 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import {
-  calculateActivityCO2,
-  summarizeByCategory,
-  getHighestImpactCategory,
-  calculateAnnualProjection,
-} from '../utils/calculations';
-import { CATEGORIES } from '../constants/carbonFactors';
+import { calculateActivityCO2, summarizeByCategory, getHighestImpactCategory, calculateAnnualProjection } from '../utils/calculations';
+import { CATEGORIES } from '../constants';
 
 describe('calculations.js', () => {
 

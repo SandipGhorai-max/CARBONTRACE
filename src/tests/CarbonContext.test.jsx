@@ -3,7 +3,7 @@ import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { CarbonContext, CarbonProvider } from '../context/CarbonContext';
 import { useContext } from 'react';
-import { CATEGORIES } from '../constants/carbonFactors';
+import { CATEGORIES } from '../constants';
 
 // Silence Firebase & React warnings in test output
 const originalWarn = console.warn;

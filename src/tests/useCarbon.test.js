@@ -3,7 +3,7 @@ import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { useCarbon } from '../hooks/useCarbon';
 import { CarbonProvider } from '../context/CarbonContext';
-import { CATEGORIES } from '../constants/carbonFactors';
+import { CATEGORIES } from '../constants';
 
 // Use React.createElement instead of JSX so this .js file parses correctly
 

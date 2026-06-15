@@ -37,3 +37,12 @@ export const generateCSV = (activities) => {
 
   return [headerRow, ...rows].join('\n');
 };
+
+/**
+ * Converts an activities array to a JSON string.
+ * @param {Array} activities
+ * @returns {string}
+ */
+export const generateJSON = (activities) => {
+  return JSON.stringify(activities || [], null, 2);
+};

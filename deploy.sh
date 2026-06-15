@@ -1,32 +1,34 @@
 #!/bin/bash
+set -e
 
-# Configuration
-PROJECT_ID="your-gcp-project-id"
-APP_NAME="carbontrace"
-REGION="us-central1"
-IMAGE_URL="gcr.io/${PROJECT_ID}/${APP_NAME}"
+# Deploy script for Google Cloud Run
+# Ensure you have gcloud CLI installed and authenticated
 
-echo "Starting deployment for ${APP_NAME}..."
+PROJECT_ID=$(gcloud config get-value project)
+if [ -z "$PROJECT_ID" ]; then
+    echo "Error: No Google Cloud Project configured. Run 'gcloud config set project [YOUR-PROJECT-ID]'"
+    exit 1
+fi
 
-# 1. Authenticate with Google Cloud (Uncomment if needed)
-# gcloud auth login
-# gcloud config set project ${PROJECT_ID}
+echo "========================================="
+echo "Building and Deploying to Google Cloud Run"
+echo "Project: $PROJECT_ID"
+echo "Service: carbontrace"
+echo "Region: us-central1"
+echo "========================================="
 
-# 2. Enable necessary APIs
-echo "Enabling Cloud Run and Container Registry APIs..."
-gcloud services enable run.googleapis.com containerregistry.googleapis.com
+# Submit build to Cloud Build
+echo "Submitting build to Cloud Build..."
+gcloud builds submit --tag gcr.io/$PROJECT_ID/carbontrace .
 
-# 3. Build the Docker container using Google Cloud Build
-echo "Building the Docker image via Cloud Build..."
-gcloud builds submit --tag ${IMAGE_URL} .
-
-# 4. Deploy to Cloud Run
+# Deploy to Cloud Run
 echo "Deploying to Cloud Run..."
-gcloud run deploy ${APP_NAME} \
-  --image ${IMAGE_URL} \
+gcloud run deploy carbontrace \
+  --image gcr.io/$PROJECT_ID/carbontrace \
   --platform managed \
-  --region ${REGION} \
-  --allow-unauthenticated \
-  --port 8080
+  --region us-central1 \
+  --allow-unauthenticated
 
-echo "Deployment complete!"
+echo "========================================="
+echo "SUCCESS! Deployment completed."
+echo "========================================="
