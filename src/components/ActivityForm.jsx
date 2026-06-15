@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useId } from 'react';
 import PropTypes from 'prop-types';
-import { CATEGORIES, CARBON_FACTORS } from '../constants/carbonFactors';
+import { CATEGORIES, CARBON_FACTORS, AMOUNT_MAX, AMOUNT_MIN, SUCCESS_DISPLAY_MS } from '../constants/carbonFactors';
 import { useCarbon } from '../hooks/useCarbon';
 import { trackEvent } from '../firebase';
 import { Send, AlertCircle } from 'lucide-react';
@@ -25,15 +25,15 @@ const ActivityForm = ({ onTransmit }) => {
     setError('');
     const numAmount = parseFloat(amount);
     if (amount.trim() === '' || isNaN(numAmount)) { setError('Please enter a valid number.'); return; }
-    if (numAmount <= 0)    { setError('Amount must be greater than zero.'); return; }
-    if (numAmount > 10000) { setError('Amount seems unrealistically high. Please verify.'); return; }
+    if (numAmount <= 0)        { setError('Amount must be greater than zero.'); return; }
+    if (numAmount > AMOUNT_MAX) { setError('Amount seems unrealistically high. Please verify.'); return; }
 
     addActivity({ category, type, amount: numAmount });
     trackEvent('activity_logged', { category, type, amount: numAmount });
     setAmount('');
     setSuccess(true);
     if (onTransmit) onTransmit();
-    setTimeout(() => setSuccess(false), 2000);
+    setTimeout(() => setSuccess(false), SUCCESS_DISPLAY_MS);
   };
 
   const selectedFactor = CARBON_FACTORS[category]?.[type];
@@ -129,7 +129,7 @@ const ActivityForm = ({ onTransmit }) => {
         <label htmlFor="activity-amount" className="mono-label">
           Amount {selectedFactor && <span style={{ color: '#4A7A9B', fontWeight: 400 }}>({selectedFactor.unit.split('/')[1]})</span>}
         </label>
-        <input id="activity-amount" type="number" step="any" min="0.01" max="10000"
+        <input id="activity-amount" type="number" step="any" min={AMOUNT_MIN} max={AMOUNT_MAX}
           value={amount} onChange={(e) => setAmount(e.target.value)}
           placeholder="e.g. 15"
           style={{ ...inputStyle, ...(focusedField === 'amt' ? focusStyle : {}) }}

@@ -1,4 +1,4 @@
-import { CARBON_FACTORS } from '../constants/carbonFactors';
+import { CARBON_FACTORS, PROJECTION_MIN_DAYS } from '../constants/carbonFactors';
 
 /**
  * Calculates total CO2 in kg for a given activity type and amount.
@@ -44,6 +44,7 @@ export const getHighestImpactCategory = (summary = {}) => {
 
 /**
  * Calculates annual CO2 projection in metric tonnes based on logged activities.
+ * Uses PROJECTION_MIN_DAYS to prevent massive extrapolation from a single log day.
  * @param {number} totalKg total CO2 logged in kg
  * @param {number} daysLogged number of unique days logged
  * @returns {number} projected annual CO2 in metric tonnes, or 0 for invalid inputs
@@ -55,10 +56,10 @@ export const calculateAnnualProjection = (totalKg, daysLogged) => {
   ) {
     return 0;
   }
-  // Use at least 7 days for averaging to prevent massive extrapolation
-  // from a single day of logging.  As more days are logged the estimate
-  // becomes progressively more accurate.
-  const effectiveDays = Math.max(daysLogged, 7);
+  // Use at least PROJECTION_MIN_DAYS for averaging to prevent massive extrapolation
+  // from a single day of logging. As more days are logged the estimate becomes
+  // progressively more accurate.
+  const effectiveDays = Math.max(daysLogged, PROJECTION_MIN_DAYS);
   const dailyAverageKg = totalKg / effectiveDays;
   const annualKg = dailyAverageKg * 365;
   return annualKg / 1000; // convert to metric tonnes

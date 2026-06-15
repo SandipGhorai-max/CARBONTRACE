@@ -35,12 +35,15 @@ describe('CarbonContext — Reducer Actions', () => {
   // ─── LOAD_DATA ───────────────────────────────────────────────────────────
   describe('LOAD_DATA action', () => {
     it('loads persisted activities from localStorage on mount (happy path)', async () => {
+      // Set lastLoginDate to TODAY so the streak-update branch is skipped,
+      // preserving the loaded streak value of 3 (not resetting to 1).
+      const today = new Date().toISOString().split('T')[0];
       const savedState = {
         activities: [
           { id: 'x1', date: new Date().toISOString(), category: 'Transport', type: 'car', amount: 5, co2: 2 },
         ],
         streak: 3,
-        lastLoginDate: null,
+        lastLoginDate: today,
       };
       localStorage.setItem('carbonTraceData', JSON.stringify(savedState));
 

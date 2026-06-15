@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, useState } from 'react';
 import { useCarbon } from '../hooks/useCarbon';
 import { useSoundEngine } from '../hooks/useSoundEngine';
+import { PROCESSING_DISPLAY_MS } from '../constants/carbonFactors';
 import ActivityForm from './ActivityForm';
 import ActionSuggestions from './ActionSuggestions';
 import WeeklyProgress from './WeeklyProgress';
@@ -11,6 +12,7 @@ import OptimizationProtocols from './OptimizationProtocols';
 import MissionDebrief from './MissionDebrief';
 import AIRobot from './AIRobot';
 import HolographicGlobe from './HolographicGlobe';
+import RobotFleet from './RobotFleet';
 import ErrorBoundary from './ErrorBoundary';
 import { Volume2, VolumeX } from 'lucide-react';
 
@@ -37,7 +39,7 @@ const Dashboard = () => {
   const handleDataTransmit = () => {
     setIsProcessing(true);
     playBeep();
-    setTimeout(() => setIsProcessing(false), 1500);
+    setTimeout(() => setIsProcessing(false), PROCESSING_DISPLAY_MS);
   };
 
   return (
@@ -135,8 +137,13 @@ const Dashboard = () => {
             </Suspense>
           </section>
 
-          <section aria-label="AI Neural Network Status"
+          <section aria-label="Robot Fleet Status"
             className="animate-slide-up" style={{ animationDelay: '0.45s', animationFillMode: 'both' }}>
+            <RobotFleet co2Tons={projectedAnnualTons} />
+          </section>
+
+          <section aria-label="AI Neural Network Status"
+            className="animate-slide-up" style={{ animationDelay: '0.5s', animationFillMode: 'both' }}>
             <NeuralNetworkCard />
           </section>
 
