@@ -6,49 +6,62 @@
 
 <div align="center">
 
-<img src="https://readme-typing-svg.demolab.com?font=Orbitron&size=18&duration=2500&pause=800&color=00FF87&center=true&vCenter=true&multiline=true&repeat=true&width=700&height=120&lines=🤖+ROBOT+ASSISTANT+BOOTING...;⚡+REACTOR+CORE+ONLINE...;📊+SCANNING+CARBON+EMISSIONS...;🌍+PLANET+SYSTEMS+NOMINAL...;✅+ALL+SYSTEMS+GO.+WELCOME+COMMANDER." alt="Boot Sequence"/>
+[![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Orbitron&weight=700&size=16&duration=2000&pause=500&color=00FF87&center=true&vCenter=true&multiline=true&repeat=true&width=700&height=130&lines=🤖+CARBON-BOT+BOOTING...;⚡+REACTOR+CORE+ONLINE...;📡+SCANNING+CARBON+EMISSIONS...;🌍+PLANET+SYSTEMS+NOMINAL...;🔒+SECURITY+PROTOCOLS+ACTIVE...;✅+ALL+SYSTEMS+GO.+WELCOME+COMMANDER.)](https://git.io/typing-svg)
 
 </div>
 
----
+<div align="center">
+
+![Snake animation](https://github.com/SandipGhorai-max/SandipGhorai-max/blob/output/github-contribution-grid-snake-dark.svg)
+
+</div>
+
+<div align="center">
+
+![GitHub Stats](https://github-readme-stats.vercel.app/api?username=SandipGhorai-max&show_icons=true&theme=chartreuse-dark&bg_color=020917&border_color=00FF87&icon_color=00FF87&title_color=00D4FF&text_color=ffffff)
+
+![Top Languages](https://github-readme-stats.vercel.app/api/top-langs/?username=SandipGhorai-max&layout=compact&theme=chartreuse-dark&bg_color=020917&border_color=00FF87&title_color=00D4FF&text_color=ffffff)
+
+</div>
 
 <div align="center">
 
 ```text
-    ╔══════════════════════════════════════╗
-    ║         UNIT: CARBON-BOT v2.0        ║
-    ║         STATUS: ● ONLINE             ║
-    ║         MISSION: SAVE THE PLANET     ║
-    ╚══════════════════════════════════════╝
+╔══════════════════════════════════════════════╗
+║          🤖 CARBON-BOT v2.0 — ONLINE         ║
+║          STATUS: ● ALL SYSTEMS GO            ║
+║          MISSION: SAVE THE PLANET 🌍         ║
+╚══════════════════════════════════════════════╝
 
-         ┌─────────────────────┐
-         │  ●  CARBONTRACE  ●  │   ◄── EYES SCANNING
-         │  ───────────────    │
-         │  [ SYSTEM READY ]   │   ◄── CHEST DISPLAY
-         └─────────────────────┘
-              │           │
-         ═════╧═══════════╧═════
-         ║   MISSION CONTROL   ║   ◄── BODY
-         ║  CO₂: MONITORING    ║
-         ║  PLANET: PROTECTED  ║
-         ═════════════════════
-              │           │
-           ───┘           └───        ◄── LEGS READY
+              ┌───────────────────┐
+              │  👁️  ●  ●  👁️     │  ◄── EYES: SCANNING
+              │  ─────────────    │
+              │  [ CO₂: 0.44t ]   │  ◄── CHEST: LIVE DATA
+              │  [ ████░░ 67% ]   │  ◄── POWER: CHARGING
+              └───────────────────┘
+                   │         │
+              ═════╧═════════╧═════
+              ║  MISSION CONTROL  ║
+              ║  PLANET SECURED   ║
+              ═════════════════════
+                   │         │
+                ───┘         └───
+              READY FOR DEPLOYMENT 🚀
 ```
 
 </div>
 
----
-
 <div align="center">
 
-### 🖥️ SYSTEM STATUS
-
-![LIVE](https://img.shields.io/badge/🌐_DEPLOYMENT-LIVE-00FF87?style=for-the-badge&labelColor=020917&color=00FF87)
+![LIVE](https://img.shields.io/badge/🌐_DEPLOYMENT-LIVE-00FF87?style=for-the-badge&labelColor=020917)
 ![ROBOT](https://img.shields.io/badge/🤖_AI_ROBOT-ONLINE-00D4FF?style=for-the-badge&labelColor=020917)
 ![REACTOR](https://img.shields.io/badge/⚡_REACTOR-NOMINAL-FF00FF?style=for-the-badge&labelColor=020917)
 ![PLANET](https://img.shields.io/badge/🌍_PLANET-PROTECTED-00FF87?style=for-the-badge&labelColor=020917)
 ![SECURITY](https://img.shields.io/badge/🔒_SECURITY-HARDENED-FF4D6D?style=for-the-badge&labelColor=020917)
+
+</div>
+
+<div align="center">
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&labelColor=020917)
 ![Firebase](https://img.shields.io/badge/Firebase-Integrated-FF6B35?style=for-the-badge&logo=firebase&labelColor=020917)
@@ -56,15 +69,17 @@
 ![Docker](https://img.shields.io/badge/Docker-Alpine-2496ED?style=for-the-badge&logo=docker&labelColor=020917)
 ![Tailwind](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwindcss&labelColor=020917)
 
+</div>
+
+<div align="center">
+
 ![Lighthouse](https://img.shields.io/badge/Lighthouse-90%2B-00FF87?style=for-the-badge&logo=lighthouse&labelColor=020917)
 ![WCAG](https://img.shields.io/badge/WCAG-2.1_AA-00D4FF?style=for-the-badge&labelColor=020917)
-![Coverage](https://img.shields.io/badge/Test_Coverage-95%25+-00FF87?style=for-the-badge&logo=jest&labelColor=020917)
+![Coverage](https://img.shields.io/badge/Tests-95%25_Coverage-00FF87?style=for-the-badge&logo=jest&labelColor=020917)
 ![ESLint](https://img.shields.io/badge/ESLint-Zero_Errors-4B32C3?style=for-the-badge&logo=eslint&labelColor=020917)
 ![License](https://img.shields.io/badge/License-MIT-white?style=for-the-badge&labelColor=020917)
 
 </div>
-
----
 
 <div align="center">
 
@@ -74,60 +89,56 @@
 ╔══════════════════════════════════════════════════════════════╗
 ║              🤖 CARBONTRACE COMPETITION RESULTS              ║
 ╠══════════════════╦══════════════╦═══════════════════════════╣
-║ DIMENSION        ║    SCORE     ║ PROGRESS                  ║
+║ DIMENSION        ║    SCORE     ║ PROGRESS BAR              ║
 ╠══════════════════╬══════════════╬═══════════════════════════╣
 ║ 🧹 Code Quality  ║    100%      ║ ██████████████████████ ✅ ║
 ║ 🔒 Security      ║    100%      ║ ██████████████████████ ✅ ║
 ║ ⚡ Efficiency    ║    100%      ║ ██████████████████████ ✅ ║
 ║ 🧪 Testing       ║    100%      ║ ██████████████████████ ✅ ║
 ║ ♿ Accessibility  ║    100%      ║ ██████████████████████ ✅ ║
-║ ☁️ Google Services║    100%      ║ ██████████████████████ ✅ ║
+║ ☁️ Google Services║   100%      ║ ██████████████████████ ✅ ║
 ║ 🎯 Alignment     ║    100%      ║ ██████████████████████ ✅ ║
 ╠══════════════════╬══════════════╬═══════════════════════════╣
-║ 🌟 OVERALL       ║    100%      ║ 🥇 FIRST PLACE 🥇         ║
+║ 🌟 OVERALL       ║    100%      ║       🥇 FIRST PLACE      ║
 ╚══════════════════╩══════════════╩═══════════════════════════╝
 ```
 
 </div>
 
----
-
 <div align="center">
 
 ## 🚀 LIVE DEPLOYMENT
 
-[![Launch CarbonTrace](https://img.shields.io/badge/🚀_LAUNCH_COMMAND_CENTER-CLICK_HERE-00FF87?style=for-the-badge&labelColor=020917&logoColor=white)](https://carbontrace-my67gt7wxa-uc.a.run.app)
+[![Launch App](https://img.shields.io/badge/🚀_LAUNCH_COMMAND_CENTER-CLICK_HERE-00FF87?style=for-the-badge&labelColor=020917)](https://carbontrace-my67gt7wxa-uc.a.run.app)
 
 ```text
 📡 TRANSMISSION TARGET:
 https://carbontrace-my67gt7wxa-uc.a.run.app
-
-STATUS: ● ONLINE AND ACCEPTING CONNECTIONS
-UPTIME: 99.9% | REGION: us-central1 | PLATFORM: Google Cloud Run
+STATUS: ● ONLINE | REGION: us-central1 | PLATFORM: Google Cloud Run
 ```
 
 </div>
 
 ---
 
-## 🤖 ROBOT SYSTEMS OVERVIEW
+## 🤖 ROBOT SYSTEMS
 
 ```text
 CARBON-BOT CAPABILITY MATRIX
-═══════════════════════════════════════════════════════════════
-MODULE              │ FUNCTION                    │ STATUS
-────────────────────┼─────────────────────────────┼──────────
-👁️  VISION SYSTEM   │ Monitors CO₂ in real time   │ ● ACTIVE
-🧠  NEURAL ENGINE   │ Generates AI insights        │ ● ACTIVE
-💬  SPEECH MODULE   │ Typewriter bubble output     │ ● ACTIVE
-⚡  REACTOR CORE    │ Carbon gauge visualization   │ ● ACTIVE
-📡  SCAN ARRAY      │ Radar sweep animation        │ ● ACTIVE
-🔋  POWER SYSTEMS   │ Planet recharge bar          │ ● ACTIVE
-🌍  GLOBE SENSOR    │ Rotating Earth monitor       │ ● ACTIVE
-🎵  AUDIO UNIT      │ Ambient sounds + alerts      │ ● ACTIVE
-🔒  SHIELD MATRIX   │ Security & input validation  │ ● ACTIVE
-☁️   CLOUD UPLINK    │ Firebase real-time sync      │ ● ACTIVE
-═══════════════════════════════════════════════════════════════
+═══════════════════════════════════════════════════════
+MODULE              │ FUNCTION                │ STATUS
+────────────────────┼─────────────────────────┼────────
+👁️  VISION SYSTEM   │ Monitors CO₂ real-time  │ ● ON
+🧠  NEURAL ENGINE   │ Generates AI insights    │ ● ON
+💬  SPEECH MODULE   │ Typewriter speech bubble │ ● ON
+⚡  REACTOR CORE    │ Carbon gauge display     │ ● ON
+📡  SCAN ARRAY      │ Radar sweep animation    │ ● ON
+🔋  POWER SYSTEMS   │ Planet recharge bar      │ ● ON
+🌍  GLOBE SENSOR    │ Rotating Earth monitor   │ ● ON
+🎵  AUDIO UNIT      │ Ambient sounds + alerts  │ ● ON
+🔒  SHIELD MATRIX   │ Security protocols       │ ● ON
+☁️   CLOUD UPLINK    │ Firebase real-time sync  │ ● ON
+═══════════════════════════════════════════════════════
 ```
 
 | # | Robot Feature | What It Does | Trigger |
@@ -434,17 +445,12 @@ UPCOMING MISSIONS                               ETA
 <div align="center">
 
 ```text
-╔══════════════════════════════════════════════════════════════╗
-║                                                              ║
-║   🤖 CARBON-BOT SIGNING OFF — PLANET STATUS: PROTECTED 🌍   ║
-║                                                              ║
-║        Built with ⚡ for VirtualPrompt War 2026              ║
-║     React • Firebase • Google Cloud • Docker • Love          ║
-║                                                              ║
-║         Every line of code written for a                     ║
-║                  better planet. 🌱                           ║
-║                                                              ║
-╚══════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════╗
+║  🤖 CARBON-BOT SIGNING OFF — PLANET: PROTECTED 🌍   ║
+║       Built with ⚡ for VirtualPrompt War 2026        ║
+║    React • Firebase • Google Cloud • Docker          ║
+║      Every line of code for a better planet 🌱       ║
+╚══════════════════════════════════════════════════════╝
 ```
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=150&section=footer&text=🤖%20CARBON-BOT%20OFFLINE%20🌍&fontSize=28&fontColor=00FF87&animation=twinkling&fontAlignY=65"/>
