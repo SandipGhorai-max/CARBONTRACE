@@ -1,4 +1,5 @@
 import React, { createContext, useReducer, useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
 import { saveToCloud, loadFromCloud, trackEvent } from '../firebase';
 
 const initialState = {
@@ -124,4 +125,9 @@ export const CarbonProvider = ({ children }) => {
       {children}
     </CarbonContext.Provider>
   );
+};
+
+CarbonProvider.propTypes = {
+  /** Child component tree that will have access to carbon state. */
+  children: PropTypes.node.isRequired,
 };

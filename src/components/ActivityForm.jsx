@@ -140,6 +140,11 @@ const ActivityForm = ({ onTransmit }) => {
         />
       </div>
 
+      {/* Success live region for screen readers */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {success ? 'Activity successfully transmitted.' : ''}
+      </div>
+
       {/* Submit */}
       <button type="submit"
         className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-black font-orbitron tracking-widest text-sm transition-all"
@@ -160,5 +165,13 @@ const ActivityForm = ({ onTransmit }) => {
   );
 };
 
-ActivityForm.propTypes = {};
+ActivityForm.propTypes = {
+  /** Optional callback fired after a valid activity is successfully submitted. */
+  onTransmit: PropTypes.func,
+};
+
+ActivityForm.defaultProps = {
+  onTransmit: null,
+};
+
 export default ActivityForm;

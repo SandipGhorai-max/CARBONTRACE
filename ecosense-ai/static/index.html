@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoSense AI - Smart Carbon Footprint Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .typing-indicator span {
+            animation: blink 1.4s infinite both;
+            height: 6px; width: 6px; background: #a0aec0; border-radius: 50%; display: inline-block; margin: 0 1px;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink { 0% { opacity: .2; } 20% { opacity: 1; } 100% { opacity: .2; } }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen">
+    <header class="bg-emerald-600 text-white p-4 shadow-md">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">EcoSense AI 🌱</h1>
+            <button id="contrastToggle" class="text-sm bg-emerald-700 px-3 py-1 rounded hover:bg-emerald-800 focus:ring-2 focus:ring-white focus:outline-none" aria-label="Toggle high contrast">High Contrast</button>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto mt-8 p-4 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Form Section -->
+        <section class="bg-white p-6 rounded-lg shadow-sm" aria-labelledby="form-heading">
+            <h2 id="form-heading" class="text-xl font-semibold mb-4">Calculate Your Footprint</h2>
+            <form id="calcForm" class="space-y-4">
+                <div>
+                    <label for="car_type" class="block text-sm font-medium">Car Type</label>
+                    <select id="car_type" name="car_type" class="mt-1 block w-full p-2 border rounded focus:ring-emerald-500" aria-required="true">
+                        <option value="car_petrol">Petrol Car</option>
+                        <option value="car_diesel">Diesel Car</option>
+                        <option value="car_ev">Electric Vehicle (EV)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="car_km_per_week" class="block text-sm font-medium">Car Distance (km/week)</label>
+                    <input type="number" id="car_km_per_week" name="car_km_per_week" value="100" min="0" class="mt-1 block w-full p-2 border rounded focus:ring-emerald-500" aria-required="true">
+                </div>
+                <div>
+                    <label for="diet_type" class="block text-sm font-medium">Diet Type</label>
+                    <select id="diet_type" name="diet_type" class="mt-1 block w-full p-2 border rounded focus:ring-emerald-500" aria-required="true">
+                        <option value="meat_heavy">Meat Heavy</option>
+                        <option value="mixed">Mixed Diet</option>
+                        <option value="vegetarian">Vegetarian</option>
+                        <option value="vegan">Vegan</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="electricity_kwh_per_month" class="block text-sm font-medium">Electricity (kWh/month)</label>
+                    <input type="number" id="electricity_kwh_per_month" name="electricity_kwh_per_month" value="300" min="0" class="mt-1 block w-full p-2 border rounded focus:ring-emerald-500" aria-required="true">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 text-white py-2 rounded hover:bg-emerald-700 font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">Analyze Footprint</button>
+            </form>
+        </section>
+
+        <!-- Results Section -->
+        <section class="space-y-6">
+            <div id="resultsCard" class="bg-white p-6 rounded-lg shadow-sm hidden" aria-live="polite">
+                <h2 class="text-xl font-semibold mb-2">Your Carbon Profile</h2>
+                <div class="text-4xl font-bold mb-1" id="scoreDisplay">0.0 Tons</div>
+                <p class="text-sm text-gray-500 mb-4" id="personaDisplay">Analyzing...</p>
+                
+                <canvas id="categoryChart" width="300" height="200" aria-label="Bar chart showing emissions by category" role="img"></canvas>
+            </div>
+
+            <!-- Chat Section -->
+            <div id="chatSection" class="bg-white p-4 rounded-lg shadow-sm h-80 flex flex-col hidden">
+                <h3 class="font-semibold mb-2">EcoSense AI Assistant</h3>
+                <div id="chatWindow" class="flex-1 overflow-y-auto border p-2 mb-2 bg-gray-50 rounded" aria-live="polite">
+                    <!-- Messages go here -->
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="chatInput" class="flex-1 p-2 border rounded focus:ring-emerald-500" placeholder="Ask Claude for advice..." aria-label="Chat input">
+                    <button id="sendChatBtn" class="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700 focus:outline-none">Send</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let chatHistory = [];
+        let chartInstance = null;
+
+        document.getElementById('calcForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            document.getElementById('resultsCard').classList.remove('hidden');
+            document.getElementById('scoreDisplay').innerText = "Calculating...";
+            
+            try {
+                const response = await fetch('/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_data: data })
+                });
+                
+                const result = await response.json();
+                
+                // Update UI
+                const scoreElem = document.getElementById('scoreDisplay');
+                scoreElem.innerText = `${result.total_tons} Tons/yr`;
+                scoreElem.className = `text-4xl font-bold mb-1 text-${result.status === 'green' ? 'emerald' : result.status === 'amber' ? 'yellow' : 'red'}-600`;
+                
+                document.getElementById('personaDisplay').innerText = result.insights.persona;
+                
+                // Draw Chart
+                drawChart(result.categories);
+                
+                // Init Chat
+                document.getElementById('chatSection').classList.remove('hidden');
+                addChatMessage("AI", result.insights.ai_message);
+                
+            } catch (err) {
+                alert("Error calculating footprint: " + err.message);
+            }
+        });
+
+        document.getElementById('sendChatBtn').addEventListener('click', sendChat);
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendChat();
+        });
+
+        async function sendChat() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            addChatMessage("You", message);
+            input.value = '';
+            
+            const typingId = showTypingIndicator();
+            
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, chat_history: chatHistory })
+                });
+                
+                const data = await response.json();
+                removeTypingIndicator(typingId);
+                
+                chatHistory.push({ role: "user", content: message });
+                chatHistory.push({ role: "assistant", content: data.reply });
+                
+                addChatMessage("AI", data.reply);
+            } catch (err) {
+                removeTypingIndicator(typingId);
+                addChatMessage("System", "Failed to get response.");
+            }
+        }
+
+        function addChatMessage(sender, text) {
+            const chatWindow = document.getElementById('chatWindow');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `mb-2 p-2 rounded ${sender === 'You' ? 'bg-blue-100 text-right ml-8' : 'bg-white border mr-8'}`;
+            msgDiv.innerHTML = `<strong>${sender}:</strong> <span class="text-sm">${text}</span>`;
+            chatWindow.appendChild(msgDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const id = 'typing-' + Date.now();
+            const chatWindow = document.getElementById('chatWindow');
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = "mb-2 p-2 mr-8 typing-indicator";
+            div.innerHTML = `<strong>AI:</strong> <span></span><span></span><span></span>`;
+            chatWindow.appendChild(div);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            return id;
+        }
+
+        function removeTypingIndicator(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function drawChart(categories) {
+            const canvas = document.getElementById('categoryChart');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const entries = Object.entries(categories);
+            const maxVal = Math.max(...entries.map(e => e[1]), 1);
+            
+            const barWidth = 40;
+            const gap = 20;
+            const startX = 30;
+            const maxHeight = 150;
+            
+            ctx.font = '12px sans-serif';
+            ctx.fillStyle = '#4a5568';
+            
+            entries.forEach(([key, val], i) => {
+                const height = (val / maxVal) * maxHeight;
+                const x = startX + i * (barWidth + gap);
+                const y = canvas.height - 20 - height;
+                
+                // Draw bar
+                ctx.fillStyle = '#10b981'; // emerald-500
+                ctx.fillRect(x, y, barWidth, height);
+                
+                // Label
+                ctx.fillStyle = '#4a5568';
+                ctx.fillText(key.substring(0, 5), x, canvas.height - 5);
+                ctx.fillText(Math.round(val), x, y - 5);
+            });
+        }
+        
+        // High Contrast Mode
+        document.getElementById('contrastToggle').addEventListener('click', () => {
+            document.body.classList.toggle('bg-gray-50');
+            document.body.classList.toggle('bg-black');
+            document.body.classList.toggle('text-gray-800');
+            document.body.classList.toggle('text-white');
+        });
+    </script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 import React, { memo } from 'react';
+import PropTypes from 'prop-types';
 
 /**
  * HolographicGlobe — A rotating Earth wireframe in the top-right corner.
@@ -30,6 +31,15 @@ const HolographicGlobe = ({ co2Tons = 0 }) => {
         style={{ background: `radial-gradient(circle, ${color}15 0%, transparent 70%)` }}/>
     </div>
   );
+};
+
+HolographicGlobe.propTypes = {
+  /** Projected annual CO2 in metric tonnes — controls the globe colour. */
+  co2Tons: PropTypes.number,
+};
+
+HolographicGlobe.defaultProps = {
+  co2Tons: 0,
 };
 
 export default memo(HolographicGlobe);

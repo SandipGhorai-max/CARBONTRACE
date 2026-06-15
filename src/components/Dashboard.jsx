@@ -41,7 +41,7 @@ const Dashboard = () => {
   };
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 md:py-10 flex flex-col gap-8">
+    <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 md:py-10 flex flex-col gap-8">
 
       {/* ── HEADER ─────────────────────────────────────────────────────── */}
       <header className="animate-slide-up" style={{ animationFillMode: 'both' }}>
@@ -80,7 +80,8 @@ const Dashboard = () => {
                 borderColor: muted ? '#1A3A5C' : '#00FF8744',
                 color: muted ? '#4A7A9B' : '#00FF87',
               }}
-              aria-label={muted ? 'Unmute sounds' : 'Mute sounds'}>
+              aria-label={muted ? 'Unmute sounds' : 'Mute sounds'}
+              aria-pressed={muted}>
               {muted ? <VolumeX size={16}/> : <Volume2 size={16}/>}
             </button>
           </div>

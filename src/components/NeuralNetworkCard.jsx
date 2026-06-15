@@ -1,4 +1,5 @@
 import React, { memo } from 'react';
+import PropTypes from 'prop-types';
 
 /**
  * NeuralNetworkCard — 3 animated bars: ANALYZE, PREDICT, OPTIMIZE
@@ -41,5 +42,11 @@ const NeuralNetworkCard = () => (
     </div>
   </div>
 );
+
+/**
+ * NeuralNetworkCard accepts no external props — all state is internal.
+ * Explicitly declared here so prop-type checkers do not flag it.
+ */
+NeuralNetworkCard.propTypes = {};
 
 export default memo(NeuralNetworkCard);

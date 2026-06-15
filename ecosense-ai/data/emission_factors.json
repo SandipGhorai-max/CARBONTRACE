@@ -1,0 +1,24 @@
+{
+  "transport": {
+    "car_petrol": 0.192,
+    "car_diesel": 0.171,
+    "car_ev": 0.053,
+    "flight_short": 0.150,
+    "flight_long": 0.115,
+    "public_transit": 0.041
+  },
+  "diet": {
+    "meat_heavy": 3.3,
+    "mixed": 2.5,
+    "vegetarian": 1.7,
+    "vegan": 1.5
+  },
+  "energy": {
+    "electricity_kwh": 0.233,
+    "gas_kwh": 0.183
+  },
+  "shopping": {
+    "clothing_item": 15.0,
+    "electronics_item": 50.0
+  }
+}

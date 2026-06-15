@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 /**
  * ErrorBoundary — Class component that catches runtime errors in the component
@@ -70,5 +71,10 @@ class ErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
+
+ErrorBoundary.propTypes = {
+  /** Child component tree to render and guard against runtime errors. */
+  children: PropTypes.node.isRequired,
+};
 
 export default ErrorBoundary;

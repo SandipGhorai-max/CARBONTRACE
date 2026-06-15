@@ -18,6 +18,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet" />
   </head>
   <body>
+    <!-- Skip-to-content: first focusable element — WCAG 2.1 AA, SC 2.4.1 -->
+    <a
+      href="#main-content"
+      style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:9999;background:#020917;color:#00FF87;padding:8px 16px;font-family:monospace;border:1px solid #00FF87;border-radius:4px;"
+      onfocus="this.style.left='8px';this.style.top='8px';this.style.width='auto';this.style.height='auto';"
+      onblur="this.style.left='-9999px';this.style.top='auto';this.style.width='1px';this.style.height='1px';"
+    >Skip to main content</a>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
