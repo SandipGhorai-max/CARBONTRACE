@@ -6,7 +6,7 @@
 
 <div align="center">
 
-<img src="https://readme-typing-svg.demolab.com?font=Orbitron&weight=700&size=18&duration=2500&pause=800&color=00FF87&center=true&vCenter=true&multiline=true&repeat=true&width=700&height=120&lines=🤖+ROBOT+ASSISTANT+BOOTING...;⚡+REACTOR+CORE+ONLINE...;📡+SCANNING+CARBON+EMISSIONS...;🌍+PLANET+SYSTEMS+NOMINAL...;🔒+SECURITY+PROTOCOLS+ACTIVE...;✅+ALL+SYSTEMS+GO.+WELCOME+COMMANDER." alt="Boot Sequence"/>
+<img src="https://readme-typing-svg.demolab.com?font=Orbitron&size=18&duration=2500&pause=800&color=00FF87&center=true&vCenter=true&multiline=true&repeat=true&width=700&height=120&lines=🤖+ROBOT+ASSISTANT+BOOTING...;⚡+REACTOR+CORE+ONLINE...;📊+SCANNING+CARBON+EMISSIONS...;🌍+PLANET+SYSTEMS+NOMINAL...;✅+ALL+SYSTEMS+GO.+WELCOME+COMMANDER." alt="Boot Sequence"/>
 
 </div>
 
