@@ -1,12 +1,12 @@
-import { CARBON_FACTORS, PROJECTION_MIN_DAYS } from '../constants';
+import { CARBON_FACTORS, PROJECTION } from '../constants';
 
 /**
  * Calculates total CO2 in kg for a given activity type and amount.
  * Pure function with no side effects.
- * @param {string} category
- * @param {string} type
- * @param {number} amount
- * @returns {number} CO2 in kg, or 0 for invalid inputs
+ * @param {string} category The category name.
+ * @param {string} type The activity type.
+ * @param {number} amount The amount logged.
+ * @returns {number} CO2 in kg, or 0 for invalid inputs.
  */
 export const calculateActivityCO2 = (category, type, amount) => {
   if (amount === null || amount === undefined || isNaN(amount) || amount <= 0) return 0;
@@ -18,8 +18,8 @@ export const calculateActivityCO2 = (category, type, amount) => {
 /**
  * Summarises total CO2 by category from an array of activities.
  * Pure function.
- * @param {Array} activities
- * @returns {Object} map of category to total kg CO2
+ * @param {Array} activities List of activity objects.
+ * @returns {Object} map of category to total kg CO2.
  */
 export const summarizeByCategory = (activities = []) => {
   if (!Array.isArray(activities)) return {};
@@ -32,8 +32,8 @@ export const summarizeByCategory = (activities = []) => {
 /**
  * Finds the highest impact category from a summary object.
  * Pure function. Returns null on ties deterministically (first entry in insertion order).
- * @param {Object} summary map of category to total kg CO2
- * @returns {string|null} category name or null if empty
+ * @param {Object} summary map of category to total kg CO2.
+ * @returns {string|null} category name or null if empty.
  */
 export const getHighestImpactCategory = (summary = {}) => {
   if (!summary || typeof summary !== 'object') return null;
@@ -44,10 +44,10 @@ export const getHighestImpactCategory = (summary = {}) => {
 
 /**
  * Calculates annual CO2 projection in metric tonnes based on logged activities.
- * Uses PROJECTION_MIN_DAYS to prevent massive extrapolation from a single log day.
- * @param {number} totalKg total CO2 logged in kg
- * @param {number} daysLogged number of unique days logged
- * @returns {number} projected annual CO2 in metric tonnes, or 0 for invalid inputs
+ * Uses PROJECTION.MIN_DAYS to prevent massive extrapolation from a single log day.
+ * @param {number} totalKg total CO2 logged in kg.
+ * @param {number} daysLogged number of unique days logged.
+ * @returns {number} projected annual CO2 in metric tonnes, or 0 for invalid inputs.
  */
 export const calculateAnnualProjection = (totalKg, daysLogged) => {
   if (
@@ -56,11 +56,11 @@ export const calculateAnnualProjection = (totalKg, daysLogged) => {
   ) {
     return 0;
   }
-  // Use at least PROJECTION_MIN_DAYS for averaging to prevent massive extrapolation
+  // Use at least PROJECTION.MIN_DAYS for averaging to prevent massive extrapolation
   // from a single day of logging. As more days are logged the estimate becomes
   // progressively more accurate.
-  const effectiveDays = Math.max(daysLogged, PROJECTION_MIN_DAYS);
+  const effectiveDays = Math.max(daysLogged, PROJECTION.MIN_DAYS);
   const dailyAverageKg = totalKg / effectiveDays;
-  const annualKg = dailyAverageKg * 365;
-  return annualKg / 1000; // convert to metric tonnes
+  const annualKg = dailyAverageKg * PROJECTION.DAYS_PER_YEAR;
+  return annualKg / PROJECTION.KG_PER_TONNE; // convert to metric tonnes
 };

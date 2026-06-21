@@ -1,124 +1,66 @@
 import React, { createContext, useReducer, useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
-import { saveToCloud, loadFromCloud, trackEvent } from '../firebase';
-
-const initialState = {
-  activities: [],
-  streak: 0,
-  lastLoginDate: null,
-};
+import { CarbonProviderProps } from '../types/propTypes';
+import { carbonReducer, initialState } from './carbonReducer';
+import { getSessionId } from '../utils/sessionId';
+import { calculateStreak } from '../utils/streakCalculator';
+import { useFirestore } from '../hooks/useFirestore';
+import { startPerfTrace, trackEvent } from '../services/firebase.analytics';
+import { ANALYTICS_EVENTS } from '../constants';
 
 export const CarbonContext = createContext(null);
 
-// Stable anonymous session ID — persisted to localStorage so it survives refreshes
-const getSessionId = () => {
-  let id = localStorage.getItem('carbonTraceSessionId');
-  if (!id) {
-    id = typeof crypto !== 'undefined' && crypto.randomUUID
-      ? crypto.randomUUID()
-      : Math.random().toString(36).substring(2);
-    localStorage.setItem('carbonTraceSessionId', id);
-  }
-  return id;
-};
-
-// Reducer for managing global state.
-const carbonReducer = (state, action) => {
-  switch (action.type) {
-    case 'LOAD_DATA':
-      return { ...state, ...action.payload };
-    case 'ADD_ACTIVITY': {
-      const newActivities = [action.payload, ...state.activities];
-      return { ...state, activities: newActivities };
-    }
-    case 'UPDATE_STREAK': {
-      return { ...state, streak: action.payload.streak, lastLoginDate: action.payload.lastLoginDate };
-    }
-    case 'RESET_DATA':
-      // Preserve streak and login date on reset — only clear activities
-      return { ...initialState, lastLoginDate: state.lastLoginDate, streak: state.streak };
-    default:
-      return state;
-  }
-};
-
+/**
+ * Provider for the Carbon context.
+ * Manages global state, persistence, and synchronization.
+ * @param {Object} props Component props.
+ * @returns {JSX.Element}
+ */
 export const CarbonProvider = ({ children }) => {
   const [state, dispatch] = useReducer(carbonReducer, initialState);
-  // Track if initial load is complete to avoid persisting before we've loaded
-  const isLoaded = useRef(false);
+  const { save, load } = useFirestore();
   const sessionId = useRef(getSessionId());
+  const initialLoadDone = useRef(false);
 
-  // Load from cloud (with localStorage fallback) and calculate streak on mount
+  // Load initial data from Firebase
   useEffect(() => {
+    let mounted = true;
     const loadData = async () => {
+      const trace = startPerfTrace('initial_load');
+      const data = await load(sessionId.current);
+      if (!mounted) {
+        trace.stop();
+        return;
+      }
+      
+      if (data) {
+        dispatch({ type: 'LOAD_DATA', payload: data });
+      }
+      
       const today = new Date().toISOString().split('T')[0];
-
-      // Attempt cloud load first, fall back to localStorage
-      let loadedState = null;
-      try {
-        loadedState = await loadFromCloud(sessionId.current);
-      } catch (_) {
-        // ignore
+      const streak = calculateStreak(data?.lastLoginDate || state.lastLoginDate, data?.streak || state.streak, today);
+      
+      dispatch({ type: 'UPDATE_STREAK', payload: { streak, lastLoginDate: today } });
+      
+      if (!data?.lastLoginDate || data.lastLoginDate !== today) {
+        trackEvent(ANALYTICS_EVENTS.DAILY_VISIT, { streak });
       }
 
-      if (!loadedState) {
-        const saved = localStorage.getItem('carbonTraceData');
-        if (saved) {
-          try {
-            loadedState = JSON.parse(saved);
-          } catch (_) {
-            // Corrupted localStorage — start fresh
-          }
-        }
-      }
-
-      if (!loadedState) {
-        loadedState = initialState;
-      }
-
-      dispatch({ type: 'LOAD_DATA', payload: loadedState });
-
-      // Fix: Only update streak if we haven't logged in today yet.
-      // This prevents streak from being re-calculated on every hard refresh.
-      if (loadedState.lastLoginDate !== today) {
-        let newStreak = loadedState.streak || 0;
-
-        if (loadedState.lastLoginDate) {
-          const lastDate = new Date(loadedState.lastLoginDate);
-          const currDate = new Date(today);
-          const diffDays = Math.round((currDate - lastDate) / (1000 * 60 * 60 * 24));
-
-          if (diffDays === 1) {
-            newStreak += 1; // consecutive day
-          } else if (diffDays > 1) {
-            newStreak = 1; // streak broken — restart
-          }
-          // diffDays === 0 is impossible here because lastLoginDate !== today
-        } else {
-          newStreak = 1; // very first login ever
-        }
-
-        dispatch({ type: 'UPDATE_STREAK', payload: { streak: newStreak, lastLoginDate: today } });
-
-        trackEvent('daily_visit', { streak: newStreak });
-      }
-
-      isLoaded.current = true;
+      initialLoadDone.current = true;
+      trace.stop();
     };
 
     loadData();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    return () => { mounted = false; };
+    // We intentionally only run this on mount, matching expected behavior.
+    // The previous eslint-disable-line is removed; instead we depend only on load
+    // which is memoized, and state which is not used directly in deps for the initial fetch.
+  }, [load]);
 
-  // Persist to both localStorage and Firebase whenever state changes (after initial load)
+  // Sync state changes to Firebase
   useEffect(() => {
-    if (!isLoaded.current) return;
-
-    // Always persist locally for offline resilience
-    localStorage.setItem('carbonTraceData', JSON.stringify(state));
-
-    // Async cloud sync — fire and forget
-    saveToCloud(sessionId.current, state);
-  }, [state]);
+    if (!initialLoadDone.current) return;
+    save(sessionId.current, state);
+  }, [state, save]);
 
   return (
     <CarbonContext.Provider value={{ state, dispatch }}>
@@ -127,7 +69,4 @@ export const CarbonProvider = ({ children }) => {
   );
 };
 
-CarbonProvider.propTypes = {
-  /** Child component tree that will have access to carbon state. */
-  children: PropTypes.node.isRequired,
-};
+CarbonProvider.propTypes = CarbonProviderProps;

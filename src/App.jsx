@@ -1,15 +1,14 @@
 import React, { useState, Suspense } from 'react';
 import { CarbonProvider } from './context/CarbonContext';
-import ErrorBoundary from './components/ErrorBoundary';
-
-import CarbonForm from './components/CarbonForm';
-import CarbonSummary from './components/CarbonSummary';
-import CarbonHistory from './components/CarbonHistory';
-import AIInsight from './components/AIInsight';
+import { CarbonForm } from './components/CarbonForm';
+import { CarbonSummary } from './components/CarbonSummary';
+import { CarbonHistory } from './components/CarbonHistory';
+import { AIInsight } from './components/AIInsight';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { useCarbon } from './hooks/useCarbon';
 
 // Lazy load Google Charts component
-const CarbonChart = React.lazy(() => import('./components/CarbonChart'));
+const CarbonChart = React.lazy(() => import('./components/CarbonChart').then(m => ({ default: m.CarbonChart })));
 
 const DashboardLayout = () => {
   const [liveCo2, setLiveCo2] = useState(0);
@@ -52,7 +51,7 @@ const DashboardLayout = () => {
   );
 };
 
-const App = () => {
+export const App = () => {
   return (
     <ErrorBoundary>
       <CarbonProvider>
@@ -62,4 +61,4 @@ const App = () => {
   );
 };
 
-export default App;
+
